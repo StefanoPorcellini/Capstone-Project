@@ -29,7 +29,7 @@ namespace GestioneOrdini.Controllers
 
         // Metodo per la creazione di un nuovo utente
         [HttpPost("create")]
-        public async Task<IActionResult> CreateUser([FromBody] UpdateUserViewModel model)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserViewModel model)
         {
             if (ModelState.IsValid)
             {

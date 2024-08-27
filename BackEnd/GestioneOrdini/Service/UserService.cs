@@ -15,20 +15,22 @@ namespace GestioneOrdini.Service
             _context = context;
         }
 
-        public async Task<User> CreateUserAsync(UpdateUserViewModel userViewModel)
+        // Metodo per creare un nuovo utente
+        public async Task<User> CreateUserAsync(CreateUserViewModel userViewModel)
         {
             try
             {
-                var role = await _context.Roles.FindAsync(userViewModel.RoleId);
+                // Trova il ruolo corrispondente al nome del ruolo selezionato
+                var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == userViewModel.RoleName);
                 if (role == null)
                 {
-                    throw new ArgumentException("Invalid role ID provided.");
+                    throw new ArgumentException("Role not found.");
                 }
 
                 var newUser = new User
                 {
                     Username = userViewModel.Username,
-                    RoleId = userViewModel.RoleId,
+                    RoleId = role.Id,
                     Role = role
                 };
 
@@ -41,10 +43,12 @@ namespace GestioneOrdini.Service
             }
             catch (Exception ex)
             {
-                throw;
+                // Aggiungi qui logica per gestire gli errori, es. logging
+                throw new Exception("An error occurred while creating the user.", ex);
             }
         }
 
+        // Metodo per eliminare un utente
         public async Task DeleteUserAsync(int userId)
         {
             try
@@ -55,13 +59,18 @@ namespace GestioneOrdini.Service
                     _context.Users.Remove(user);
                     await _context.SaveChangesAsync();
                 }
+                else
+                {
+                    throw new ArgumentException("User not found.");
+                }
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("An error occurred while deleting the user.", ex);
             }
         }
 
+        // Metodo per ottenere tutti gli utenti
         public async Task<IEnumerable<UserViewModel>> GetAllUsersAsync()
         {
             try
@@ -79,10 +88,11 @@ namespace GestioneOrdini.Service
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("An error occurred while retrieving users.", ex);
             }
         }
 
+        // Metodo per ottenere un utente per ID
         public async Task<UserViewModel> GetUserByIdAsync(int userId)
         {
             try
@@ -105,10 +115,11 @@ namespace GestioneOrdini.Service
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("An error occurred while retrieving the user.", ex);
             }
         }
 
+        // Metodo di login
         public async Task<User> LoginAsync(string username, string password)
         {
             try
@@ -126,10 +137,11 @@ namespace GestioneOrdini.Service
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("An error occurred during login.", ex);
             }
         }
 
+        // Metodo per aggiornare un utente esistente
         public async Task UpdateUserAsync(UpdateUserViewModel userViewModel)
         {
             try
@@ -165,12 +177,11 @@ namespace GestioneOrdini.Service
             }
             catch (Exception ex)
             {
-                // Gestione degli errori
-                throw;
+                throw new Exception("An error occurred while updating the user.", ex);
             }
         }
 
-
+        // Metodo per ottenere tutti i ruoli
         public async Task<IEnumerable<Role>> GetAllRolesAsync()
         {
             try
@@ -179,7 +190,7 @@ namespace GestioneOrdini.Service
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("An error occurred while retrieving roles.", ex);
             }
         }
     }
