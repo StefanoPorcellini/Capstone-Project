@@ -3,11 +3,12 @@
     public class Order
     {
         public int Id { get; set; }
-        public required string Description { get; set; }
-        public required int Quantity { get; set; } = 1;
-        public required int TypeId { get; set; }
-        public int Price { get; set; }
-        public int DimensionId { get; set; }
-        public virtual Dimension Dimension { get; set; }
+        public int CustomerId { get; set; }
+        public string CustomerName { get; set; }
+        public DateTime Date { get; set; }
+        public DateTime? MaxDeliveryDate { get; set; } // Nullable if not required
+        public int ItemId { get; set; }
+
+        public virtual Item Item { get; set; }
     }
 }

@@ -1,7 +1,10 @@
 using GestioneOrdini.Context;
 using GestioneOrdini.Interface;
-using GestioneOrdini.Service;  // Aggiungi questo namespace
+using GestioneOrdini.Service;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace GestioneOrdini
 {
@@ -11,23 +14,41 @@ namespace GestioneOrdini
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Aggiungi i servizi al container.
             builder.Services.AddControllers();
 
-            // Add DbContext with SQL Server provider
+            // Aggiungi DbContext con il SQL Server provider
             builder.Services.AddDbContext<OrdersDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DbGO")));
 
-            // Register IUserService with its implementation UserService
+            // Registrazione IUserService con la sua implementazione UserService
             builder.Services.AddScoped<IUserService, UserService>();
+
+            // Registrazione ICustomerService con la sua implementazione CustomerService
+            builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+            // Registrazione IOrderService con la sua implementazione OrderService (se applicabile)
+            //builder.Services.AddScoped<IOrderService, OrderService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Configurazione della gestione degli errori globali (opzionale)
+            builder.Services.AddExceptionHandler(options =>
+            {
+                options.ExceptionHandler = context =>
+                {
+                    // Configura la gestione degli errori
+                    // Ad esempio, restituisci una risposta JSON con informazioni sull'errore
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync("{\"error\": \"An error occurred.\"}");
+                };
+            });
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configura la pipeline delle richieste HTTP.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -36,7 +57,9 @@ namespace GestioneOrdini
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            // Configura la sicurezza, ad esempio, autenticazione e autorizzazione
+            // app.UseAuthentication();
+            // app.UseAuthorization();
 
             app.MapControllers();
 
