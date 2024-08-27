@@ -16,23 +16,63 @@ namespace GestioneOrdini.Service
             _context = context;
         }
 
-        // Metodo per creare un cliente
-        public async Task<Customer> CreateCustomerAsync(Customer customer)
+        // Metodo per creare un cliente in base al tipo scelto
+        public async Task<Customer> CreateCustomerAsync
+            (string customerType, string name, string address, string email, string tel, string? cf = null, string? partitaIVA = null, 
+            string? ragioneSociale = null)
         {
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            Customer customer;
+
+            if (customerType == "Company")
+            {
+                if (string.IsNullOrWhiteSpace(partitaIVA) || string.IsNullOrWhiteSpace(ragioneSociale))
+                {
+                    throw new ArgumentException("Partita IVA e Ragione Sociale sono richiesti per i clienti aziendali.");
+                }
+
+                customer = new CustomerCompany
+                {
+                    Name = name,
+                    Address = address,
+                    Email = email,
+                    Tel = tel,
+                    PartitaIVA = partitaIVA,
+                    RagioneSociale = ragioneSociale
+                };
+
+                await CreateCustomerCompanyAsync((CustomerCompany)customer);
+            }
+            else if (customerType == "Private")
+            {
+                
+                customer = new CustomerPrivate
+                {
+                    Name = name,
+                    Address = address,
+                    Email = email,
+                    Tel = tel,
+                    CF = cf
+                };
+
+                await CreateCustomerPrivateAsync((CustomerPrivate)customer);
+            }
+            else
+            {
+                throw new ArgumentException("Tipo di cliente non valido.");
+            }
+
             return customer;
         }
 
-        // Metodi per creare clienti specifici
-        public async Task<CustomerCompany> CreateCustomerCompanyAsync(CustomerCompany customerCompany)
+        // Metodi privati per creare clienti specifici
+        private async Task<CustomerCompany> CreateCustomerCompanyAsync(CustomerCompany customerCompany)
         {
             _context.Customers.Add(customerCompany); // Aggiungi come Customer
             await _context.SaveChangesAsync();
             return customerCompany;
         }
 
-        public async Task<CustomerPrivate> CreateCustomerPrivateAsync(CustomerPrivate customerPrivate)
+        private async Task<CustomerPrivate> CreateCustomerPrivateAsync(CustomerPrivate customerPrivate)
         {
             _context.Customers.Add(customerPrivate); // Aggiungi come Customer
             await _context.SaveChangesAsync();

@@ -17,36 +17,31 @@ namespace GestioneOrdini.Controllers
             _customerService = customerService;
         }
 
-        // Create customer
+        // Create customer based on type
         [HttpPost]
-        public async Task<IActionResult> CreateCustomer([FromBody] Customer customer)
+        public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerRequest request)
         {
             if (ModelState.IsValid)
             {
-                var createdCustomer = await _customerService.CreateCustomerAsync(customer);
-                return CreatedAtAction(nameof(GetCustomerById), new { id = createdCustomer.Id }, createdCustomer);
-            }
-            return BadRequest(ModelState);
-        }
+                try
+                {
+                    var createdCustomer = await _customerService.CreateCustomerAsync(
+                        request.CustomerType,
+                        request.Name,
+                        request.Address,
+                        request.Email,
+                        request.Tel,
+                        request.CF,
+                        request.PartitaIVA,
+                        request.RagioneSociale
+                    );
 
-        [HttpPost("company")]
-        public async Task<IActionResult> CreateCustomerCompany([FromBody] CustomerCompany customerCompany)
-        {
-            if (ModelState.IsValid)
-            {
-                var createdCustomerCompany = await _customerService.CreateCustomerCompanyAsync(customerCompany);
-                return CreatedAtAction(nameof(GetCustomerCompanyById), new { id = createdCustomerCompany.Id }, createdCustomerCompany);
-            }
-            return BadRequest(ModelState);
-        }
-
-        [HttpPost("private")]
-        public async Task<IActionResult> CreateCustomerPrivate([FromBody] CustomerPrivate customerPrivate)
-        {
-            if (ModelState.IsValid)
-            {
-                var createdCustomerPrivate = await _customerService.CreateCustomerPrivateAsync(customerPrivate);
-                return CreatedAtAction(nameof(GetCustomerPrivateById), new { id = createdCustomerPrivate.Id }, createdCustomerPrivate);
+                    return CreatedAtAction(nameof(GetCustomerById), new { id = createdCustomer.Id }, createdCustomer);
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
             }
             return BadRequest(ModelState);
         }
@@ -71,28 +66,6 @@ namespace GestioneOrdini.Controllers
             return NotFound();
         }
 
-        [HttpGet("company/{id}")]
-        public async Task<IActionResult> GetCustomerCompanyById(int id)
-        {
-            var customerCompany = await _customerService.GetCustomerCompanyByIdAsync(id);
-            if (customerCompany != null)
-            {
-                return Ok(customerCompany);
-            }
-            return NotFound();
-        }
-
-        [HttpGet("private/{id}")]
-        public async Task<IActionResult> GetCustomerPrivateById(int id)
-        {
-            var customerPrivate = await _customerService.GetCustomerPrivateByIdAsync(id);
-            if (customerPrivate != null)
-            {
-                return Ok(customerPrivate);
-            }
-            return NotFound();
-        }
-
         // Update customer
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCustomer(int id, [FromBody] Customer customer)
@@ -104,8 +77,15 @@ namespace GestioneOrdini.Controllers
 
             if (ModelState.IsValid)
             {
-                await _customerService.UpdateCustomerAsync(customer);
-                return NoContent();
+                try
+                {
+                    await _customerService.UpdateCustomerAsync(customer);
+                    return NoContent();
+                }
+                catch (ArgumentException ex)
+                {
+                    return NotFound(ex.Message);
+                }
             }
             return BadRequest(ModelState);
         }
@@ -117,5 +97,17 @@ namespace GestioneOrdini.Controllers
             await _customerService.DeleteCustomerAsync(id);
             return NoContent();
         }
+    }
+
+    public class CreateCustomerRequest
+    {
+        public string CustomerType { get; set; } // "Private" or "Company"
+        public string Name { get; set; }
+        public string? Address { get; set; }
+        public string? Email { get; set; }
+        public string Tel { get; set; }
+        public string? CF { get; set; } // Required if Private
+        public string? PartitaIVA { get; set; } // Required if Company
+        public string? RagioneSociale { get; set; } // Required if Company
     }
 }
