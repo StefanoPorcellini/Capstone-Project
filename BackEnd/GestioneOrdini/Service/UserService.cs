@@ -15,11 +15,10 @@ namespace GestioneOrdini.Service
             _context = context;
         }
 
-        public async Task<User> CreateUserAsync(NewUserViewModel userViewModel)
+        public async Task<User> CreateUserAsync(UpdateUserViewModel userViewModel)
         {
             try
             {
-                // Ottieni il ruolo dal database
                 var role = await _context.Roles.FindAsync(userViewModel.RoleId);
                 if (role == null)
                 {
@@ -42,7 +41,6 @@ namespace GestioneOrdini.Service
             }
             catch (Exception ex)
             {
-                // Gestione degli errori durante la creazione dell'utente
                 throw;
             }
         }
@@ -51,46 +49,62 @@ namespace GestioneOrdini.Service
         {
             try
             {
-                var utente = await _context.Users.FindAsync(userId);
-                if (utente != null)
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
                 {
-                    _context.Users.Remove(utente);
+                    _context.Users.Remove(user);
                     await _context.SaveChangesAsync();
                 }
-                else
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<UserViewModel>> GetAllUsersAsync()
+        {
+            try
+            {
+                var users = await _context.Users
+                    .Include(u => u.Role)  // Include il ruolo nei risultati
+                    .ToListAsync();
+
+                return users.Select(u => new UserViewModel
                 {
-                    // Gestione del caso in cui l'utente non viene trovato per l'eliminazione
+                    Id = u.Id,
+                    Username = u.Username,
+                    RoleName = u.Role.Name
+                });
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<UserViewModel> GetUserByIdAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.Role)  // Include il ruolo nei risultati
+                    .SingleOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    return null;
                 }
-            }
-            catch (Exception ex)
-            {
-                // Gestione degli errori durante l'eliminazione dell'utente
-                throw;
-            }
-        }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
-        {
-            try
-            {
-                return await _context.Users.ToListAsync();
+                return new UserViewModel
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    RoleName = user.Role.Name
+                };
             }
             catch (Exception ex)
             {
-                // Gestione degli errori durante il recupero di tutti gli utenti
-                throw;
-            }
-        }
-
-        public async Task<User> GetUserByIdAsync(int userId)
-        {
-            try
-            {
-                return await _context.Users.FindAsync(userId);
-            }
-            catch (Exception ex)
-            {
-                // Gestione degli errori durante la ricerca dell'utente per ID
                 throw;
             }
         }
@@ -99,45 +113,63 @@ namespace GestioneOrdini.Service
         {
             try
             {
-                var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
-                if (user == null)
+                var user = await _context.Users
+                    .Include(u => u.Role)  // Include il ruolo nei risultati
+                    .SingleOrDefaultAsync(u => u.Username == username);
+
+                if (user == null || !PasswordService.VerifyPassword(password, user.PasswordSalt, user.PasswordHash))
                 {
-                    // Gestione del caso in cui l'utente non viene trovato
                     return null;
                 }
 
-                bool isValid = PasswordService.VerifyPassword(password, user.PasswordSalt, user.PasswordHash);
-                if (isValid)
-                {
-                    return user;
-                }
-                else
-                {
-                    // Gestione del caso in cui la password non è valida
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Gestione degli errori durante il login
-                throw;
-            }
-        }
-
-        public async Task<User> UpdateUserAsync(User user)
-        {
-            try
-            {
-                _context.Entry(user).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
                 return user;
             }
             catch (Exception ex)
             {
-                // Gestione degli errori durante l'aggiornamento dell'utente
                 throw;
             }
         }
+
+        public async Task UpdateUserAsync(UpdateUserViewModel userViewModel)
+        {
+            try
+            {
+                // Trova l'utente da aggiornare
+                var user = await _context.Users.FindAsync(userViewModel.Id);
+                if (user == null)
+                {
+                    throw new ArgumentException("User not found.");
+                }
+
+                // Aggiorna il nome utente
+                user.Username = userViewModel.Username;
+
+                // Aggiorna la password solo se è stata fornita una nuova password
+                if (!string.IsNullOrEmpty(userViewModel.Password))
+                {
+                    user.SetPassword(userViewModel.Password);
+                }
+
+                // Trova il ruolo corrispondente al nome del ruolo selezionato
+                var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == userViewModel.RoleName);
+                if (role == null)
+                {
+                    throw new ArgumentException("Role not found.");
+                }
+
+                // Aggiorna l'ID del ruolo
+                user.RoleId = role.Id;
+
+                // Salva le modifiche nel database
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Gestione degli errori
+                throw;
+            }
+        }
+
 
         public async Task<IEnumerable<Role>> GetAllRolesAsync()
         {
@@ -147,10 +179,8 @@ namespace GestioneOrdini.Service
             }
             catch (Exception ex)
             {
-                // Gestione degli errori durante il recupero di tutti i ruoli
                 throw;
             }
         }
-
     }
 }

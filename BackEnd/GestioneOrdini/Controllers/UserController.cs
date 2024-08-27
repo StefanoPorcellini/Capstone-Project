@@ -29,7 +29,7 @@ namespace GestioneOrdini.Controllers
 
         // Metodo per la creazione di un nuovo utente
         [HttpPost("create")]
-        public async Task<IActionResult> CreateUser([FromBody] NewUserViewModel model)
+        public async Task<IActionResult> CreateUser([FromBody] UpdateUserViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -86,8 +86,9 @@ namespace GestioneOrdini.Controllers
         }
 
         // Metodo per aggiornare un utente
+
         [HttpPut("update/{userId}")]
-        public async Task<IActionResult> UpdateUser(int userId, [FromBody] User user)
+        public async Task<IActionResult> UpdateUser(int userId, [FromBody] UpdateUserViewModel user)
         {
             if (userId != user.Id)
             {
@@ -98,8 +99,8 @@ namespace GestioneOrdini.Controllers
             {
                 try
                 {
-                    var updatedUser = await _userService.UpdateUserAsync(user);
-                    return Ok(updatedUser);
+                    await _userService.UpdateUserAsync(user);
+                    return Ok(new { Message = "User updated successfully." });
                 }
                 catch (Exception ex)
                 {
@@ -109,6 +110,7 @@ namespace GestioneOrdini.Controllers
             }
             return BadRequest(ModelState);
         }
+
 
         // Metodo per eliminare un utente
         [HttpDelete("delete/{userId}")]
