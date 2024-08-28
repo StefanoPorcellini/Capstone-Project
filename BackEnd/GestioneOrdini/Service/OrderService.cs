@@ -93,16 +93,17 @@ namespace GestioneOrdini.Service
             // Logica per altri tipi di item (PlotterItem)
             else if (order.Item is PlotterItem plotterItem)
             {
-                if (plotterItem.PlotterStandardId.HasValue)
-                {
-                    var plotterStandard = await _context.PlotterStandards.FindAsync(plotterItem.PlotterStandardId.Value);
-                    return plotterStandard.Price;
-                }
-                else
+                if (plotterItem.IsCustom)
                 {
                     // Calcolo per plotter custom
                     var area = (decimal)(plotterItem.Base * plotterItem.Height);
-                    return area * (decimal)plotterItem.PricePerSquareMeter;
+                    return area * (decimal)plotterItem.PricePerSquareMeter * plotterItem.Quantity.Value;
+                }
+                else if (plotterItem.PlotterStandardId.HasValue)
+                {
+                    // Utilizza il prezzo fisso del PlotterStandard
+                    var plotterStandard = await _context.PlotterStandards.FindAsync(plotterItem.PlotterStandardId.Value);
+                    return plotterStandard.Price * plotterItem.Quantity.Value;
                 }
             }
 
