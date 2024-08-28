@@ -6,9 +6,12 @@
         public int CustomerId { get; set; }
         public string CustomerName { get; set; }
         public DateTime Date { get; set; }
-        public DateTime? MaxDeliveryDate { get; set; } // Nullable if not required
+        public DateTime? MaxDeliveryDate { get; set; } 
         public int ItemId { get; set; }
 
         public virtual Item Item { get; set; }
+
+        public decimal TotalAmount { get; set; } 
+
     }
 }

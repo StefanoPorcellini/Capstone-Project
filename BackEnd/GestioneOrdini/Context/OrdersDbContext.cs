@@ -17,6 +17,7 @@ namespace GestioneOrdini.Context
         public DbSet<PlotterItem> PlotterItems { get; set; }
         public DbSet<LaserStandard> LaserStandards { get; set; }
         public DbSet<PlotterStandard> PlotterStandards { get; set; }
+        public DbSet<LaserPriceList> LaserPriceLists { get; set; }
 
         public OrdersDbContext(DbContextOptions<OrdersDbContext> options) : base(options) { }
 
@@ -78,6 +79,13 @@ namespace GestioneOrdini.Context
             modelBuilder.Entity<PlotterItem>()
                 .Property(pi => pi.PricePerSquareMeter)
                 .HasColumnType("decimal(18,2)"); // Configurazione opzionale
+
+            // Configura la relazione tra LaserItem e LaserPriceList
+            modelBuilder.Entity<LaserItem>()
+                .HasMany(li => li.LaserPriceLists)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
