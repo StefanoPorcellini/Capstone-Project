@@ -28,7 +28,14 @@ namespace GestioneOrdini
             builder.Services.AddScoped<ICustomerService, CustomerService>();
 
             // Registrazione IOrderService con la sua implementazione OrderService (se applicabile)
-            //builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+
+            // Registrazione servizio generico
+            builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+
+            // Registazione LaserPriceListService
+            builder.Services.AddScoped<ILaserPriceListService, LaserPriceListService>();
+
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
