@@ -3,6 +3,7 @@ using GestioneOrdini.Interface;
 using GestioneOrdini.Model.Order;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GestioneOrdini.Service
@@ -10,14 +11,19 @@ namespace GestioneOrdini.Service
     public class OrderService : IOrderService
     {
         private readonly OrdersDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public OrderService(OrdersDbContext context)
+        public OrderService(OrdersDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Order> CreateOrderAsync(Order order)
         {
+            // Imposta lo stato iniziale a "Nuovo Ordine" (ID 1)
+            order.StatusId = 1;
+
             // Calcola il totale prima di salvare l'ordine
             order.TotalAmount = await CalculateTotalAmountAsync(order);
 
@@ -29,14 +35,16 @@ namespace GestioneOrdini.Service
         public async Task<Order> GetOrderByIdAsync(int id)
         {
             return await _context.Orders
-                .Include(o => o.Item) // Includi l'Item correlato
+                .Include(o => o.Item)
+                .Include(o => o.Status) // Includi lo stato dell'ordine
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
             return await _context.Orders
-                .Include(o => o.Item) // Includi gli Item correlati
+                .Include(o => o.Item)
+                .Include(o => o.Status) // Includi lo stato dell'ordine
                 .ToListAsync();
         }
 
@@ -58,13 +66,13 @@ namespace GestioneOrdini.Service
                 await _context.SaveChangesAsync();
             }
         }
+
         public async Task<decimal> CalculateTotalAmountAsync(Order order)
         {
             if (order.Item is LaserItem laserItem)
             {
                 if (laserItem.IsCustom)
                 {
-                    // Trova il listino prezzi che corrisponde alla quantità per il laser custom
                     var priceList = await _context.LaserPriceLists
                         .Where(lp => lp.MinQuantity <= laserItem.Quantity &&
                                      (lp.MaxQuantity == null || laserItem.Quantity <= lp.MaxQuantity))
@@ -81,7 +89,6 @@ namespace GestioneOrdini.Service
                 }
                 else if (laserItem.LaserStandardId.HasValue)
                 {
-                    // Utilizza il prezzo fisso del LaserStandard
                     var laserStandard = await _context.LaserStandards.FindAsync(laserItem.LaserStandardId.Value);
                     if (laserStandard != null)
                     {
@@ -89,25 +96,41 @@ namespace GestioneOrdini.Service
                     }
                 }
             }
-
-            // Logica per altri tipi di item (PlotterItem)
             else if (order.Item is PlotterItem plotterItem)
             {
                 if (plotterItem.IsCustom)
                 {
-                    // Calcolo per plotter custom
                     var area = (decimal)(plotterItem.Base * plotterItem.Height);
                     return area * (decimal)plotterItem.PricePerSquareMeter * plotterItem.Quantity.Value;
                 }
                 else if (plotterItem.PlotterStandardId.HasValue)
                 {
-                    // Utilizza il prezzo fisso del PlotterStandard
                     var plotterStandard = await _context.PlotterStandards.FindAsync(plotterItem.PlotterStandardId.Value);
                     return plotterStandard.Price * plotterItem.Quantity.Value;
                 }
             }
 
             return 0;
+        }
+
+        // Metodo per assegnare un ordine all'utente loggato
+        public async Task AssignOrderToOperatorAsync(int orderId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order != null)
+            {
+                // Recupera il nome dell'utente loggato
+                var operatorName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+
+                if (string.IsNullOrEmpty(operatorName))
+                {
+                    throw new Exception("Non è stato possibile determinare l'utente loggato.");
+                }
+
+                order.OperatorName = operatorName;
+                order.StatusId = 2; // Imposta lo stato a "In Lavorazione" (ID 2)
+                await _context.SaveChangesAsync();
+            }
         }
 
     }

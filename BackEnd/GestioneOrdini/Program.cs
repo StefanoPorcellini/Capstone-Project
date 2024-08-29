@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace GestioneOrdini
 {
@@ -21,52 +25,62 @@ namespace GestioneOrdini
             builder.Services.AddDbContext<OrdersDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DbGO")));
 
-            // Registrazione IUserService con la sua implementazione UserService
+            // Registrazione dei servizi con le loro implementazioni
             builder.Services.AddScoped<IUserService, UserService>();
-
-            // Registrazione ICustomerService con la sua implementazione CustomerService
             builder.Services.AddScoped<ICustomerService, CustomerService>();
-
-            // Registrazione IOrderService con la sua implementazione OrderService (se applicabile)
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<ILaserPriceListService, LaserPriceListService>();
 
             // Registrazione servizio generico
             builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 
-            // Registazione LaserPriceListService
-            builder.Services.AddScoped<ILaserPriceListService, LaserPriceListService>();
+            // Aggiungi l'accesso al contesto HTTP per l'uso nei servizi
+            builder.Services.AddHttpContextAccessor();
 
+            // Configurazione dell'autenticazione JWT (opzionale, solo se usi JWT)
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
+
+            // Aggiungi autorizzazione
+            builder.Services.AddAuthorization();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-            // Configurazione della gestione degli errori globali (opzionale)
-            builder.Services.AddExceptionHandler(options =>
-            {
-                options.ExceptionHandler = context =>
-                {
-                    // Configura la gestione degli errori
-                    // Ad esempio, restituisci una risposta JSON con informazioni sull'errore
-                    context.Response.ContentType = "application/json";
-                    return context.Response.WriteAsync("{\"error\": \"An error occurred.\"}");
-                };
-            });
 
             var app = builder.Build();
 
             // Configura la pipeline delle richieste HTTP.
             if (app.Environment.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
+            }
+            else
+            {
+                // Configurazione della gestione degli errori globali per la produzione
+                app.UseExceptionHandler("/error");
+                app.UseHsts();
             }
 
             app.UseHttpsRedirection();
 
             // Configura la sicurezza, ad esempio, autenticazione e autorizzazione
-            // app.UseAuthentication();
-            // app.UseAuthorization();
+            app.UseAuthentication(); // Se usi autenticazione
+            app.UseAuthorization();
 
             app.MapControllers();
 

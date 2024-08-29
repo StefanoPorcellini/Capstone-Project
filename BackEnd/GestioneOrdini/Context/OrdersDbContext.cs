@@ -8,9 +8,9 @@ namespace GestioneOrdini.Context
 {
     public class OrdersDbContext : DbContext
     {
-        public virtual DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<Item> Item { get; set; }
+        public DbSet<Item> Items { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<LaserItem> LaserItems { get; set; }
@@ -18,6 +18,7 @@ namespace GestioneOrdini.Context
         public DbSet<LaserStandard> LaserStandards { get; set; }
         public DbSet<PlotterStandard> PlotterStandards { get; set; }
         public DbSet<LaserPriceList> LaserPriceLists { get; set; }
+        public DbSet<OrderStatus> OrderStatuses { get; set; } // Aggiunta la configurazione per OrderStatus
 
         public OrdersDbContext(DbContextOptions<OrdersDbContext> options) : base(options) { }
 
@@ -65,27 +66,30 @@ namespace GestioneOrdini.Context
                 .HasForeignKey(o => o.ItemId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Configura la relazione tra Order e OrderStatus
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Status)
+                .WithMany()
+                .HasForeignKey(o => o.StatusId);
+
             // Configurazione delle precisioni per i campi Price
             modelBuilder.Entity<LaserStandard>()
                 .Property(ls => ls.Price)
-                .HasColumnType("decimal(18,2)"); // Precisione di 18 cifre con 2 decimali
+                .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PlotterStandard>()
                 .Property(ps => ps.Price)
-                .HasColumnType("decimal(18,2)"); // Precisione di 18 cifre con 2 decimali
+                .HasColumnType("decimal(18,2)");
 
-            // Se hai altri campi decimal in altre entità, configura anche quelli
-            // Ad esempio, se PlotterItem ha una proprietà PricePerSquareMeter
             modelBuilder.Entity<PlotterItem>()
                 .Property(pi => pi.PricePerSquareMeter)
-                .HasColumnType("decimal(18,2)"); // Configurazione opzionale
+                .HasColumnType("decimal(18,2)");
 
             // Configura la relazione tra LaserItem e LaserPriceList
             modelBuilder.Entity<LaserItem>()
                 .HasMany(li => li.LaserPriceLists)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Restrict);
-
         }
     }
 }
