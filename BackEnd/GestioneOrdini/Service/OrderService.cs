@@ -21,10 +21,7 @@ namespace GestioneOrdini.Service
 
         public async Task<Order> CreateOrderAsync(Order order)
         {
-            // Imposta lo stato iniziale a "Nuovo Ordine" (ID 1)
             order.StatusId = 1;
-
-            // Calcola il totale prima di salvare l'ordine
             order.TotalAmount = await CalculateTotalAmountAsync(order);
 
             _context.Orders.Add(order);
@@ -36,7 +33,7 @@ namespace GestioneOrdini.Service
         {
             return await _context.Orders
                 .Include(o => o.Item)
-                .Include(o => o.Status) // Includi lo stato dell'ordine
+                .Include(o => o.Status)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
@@ -44,15 +41,13 @@ namespace GestioneOrdini.Service
         {
             return await _context.Orders
                 .Include(o => o.Item)
-                .Include(o => o.Status) // Includi lo stato dell'ordine
+                .Include(o => o.Status)
                 .ToListAsync();
         }
 
         public async Task UpdateOrderAsync(Order order)
         {
-            // Calcola nuovamente il totale prima di aggiornare l'ordine
             order.TotalAmount = await CalculateTotalAmountAsync(order);
-
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
         }
@@ -113,13 +108,11 @@ namespace GestioneOrdini.Service
             return 0;
         }
 
-        // Metodo per assegnare un ordine all'utente loggato
         public async Task AssignOrderToOperatorAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order != null)
             {
-                // Recupera il nome dell'utente loggato
                 var operatorName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
 
                 if (string.IsNullOrEmpty(operatorName))
@@ -128,10 +121,24 @@ namespace GestioneOrdini.Service
                 }
 
                 order.OperatorName = operatorName;
-                order.StatusId = 2; // Imposta lo stato a "In Lavorazione" (ID 2)
+                order.StatusId = 2;
                 await _context.SaveChangesAsync();
             }
         }
 
+        public async Task UpdateOrderStatusAsync(int orderId, int newStatusId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order != null)
+            {
+                order.StatusId = newStatusId;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<OrderStatus>> GetAllOrderStatusesAsync()
+        {
+            return await _context.OrderStatuses.ToListAsync();
+        }
     }
 }

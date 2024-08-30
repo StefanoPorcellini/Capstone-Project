@@ -49,6 +49,14 @@ namespace GestioneOrdini.Controllers
             return Ok(orders);
         }
 
+        // Get all Order Statuses
+        [HttpGet("statuses")]
+        public async Task<IActionResult> GetAllOrderStatuses()
+        {
+            var statuses = await _orderService.GetAllOrderStatusesAsync();
+            return Ok(statuses);
+        }
+
         // Update an Order
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
@@ -72,6 +80,36 @@ namespace GestioneOrdini.Controllers
         {
             await _orderService.DeleteOrderAsync(id);
             return NoContent();
+        }
+
+        // Assign Order to Operator
+        [HttpPost("{id}/assign")]
+        public async Task<IActionResult> AssignOrderToOperator(int id)
+        {
+            try
+            {
+                await _orderService.AssignOrderToOperatorAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // Update Order Status
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] int newStatusId)
+        {
+            try
+            {
+                await _orderService.UpdateOrderStatusAsync(id, newStatusId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }
