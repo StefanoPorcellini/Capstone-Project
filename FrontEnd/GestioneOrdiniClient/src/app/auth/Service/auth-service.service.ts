@@ -6,7 +6,7 @@ import { BehaviorSubject, map, Observable, retry, tap } from 'rxjs';
 import { iUser } from '../../models/user';
 import { Router } from '@angular/router';
 import { iAuthResponse } from '../../models/auth-response';
-
+import { environment } from '../../../environments/environment.development';
 @Injectable({
   providedIn: 'root'
 })
@@ -26,15 +26,13 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router:Router) { this.restoreUser() }
 
-  private loginUrl = "https://localhost:7147/api/User/login";
-  private createUrl = "https://localhost:7147/api/User/create";
 
   create(newUser:Partial<iUser>):Observable<iAuthResponse>{
-    return this.http.post<iAuthResponse>(this.createUrl, newUser)
+    return this.http.post<iAuthResponse>(environment.createUrl, newUser)
   }
 
   login(authData:iAuthData):Observable<iAuthResponse>{
-    return this.http.post<iAuthResponse>(this.loginUrl, authData)
+    return this.http.post<iAuthResponse>(environment.loginUrl, authData)
     .pipe(tap(data=>{
       this.authSubject.next(data.user)
       localStorage.setItem('accessData', JSON.stringify(data))
