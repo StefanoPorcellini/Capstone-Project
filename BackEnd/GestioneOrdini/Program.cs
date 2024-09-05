@@ -37,6 +37,18 @@ namespace GestioneOrdini
             // Aggiungi l'accesso al contesto HTTP per l'uso nei servizi
             builder.Services.AddHttpContextAccessor();
 
+            // Configurazione di CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200") // Origine frontend
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+
             // Configurazione dell'autenticazione JWT (opzionale, solo se usi JWT)
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -75,6 +87,9 @@ namespace GestioneOrdini
                 app.UseExceptionHandler("/error");
                 app.UseHsts();
             }
+
+            // Abilita CORS
+            app.UseCors("AllowFrontend");
 
             app.UseHttpsRedirection();
 

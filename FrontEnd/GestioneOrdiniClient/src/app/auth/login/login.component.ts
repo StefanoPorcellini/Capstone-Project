@@ -13,33 +13,37 @@ import Swal from 'sweetalert2';
 export class LoginComponent implements OnInit {
 
   constructor(
-    private authSvc:AuthService,
-    private router:Router
-  ){}
+    private authSvc: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {}
 
-  login(form: NgForm){
-    try {
-      this.authSvc.login(form.value).subscribe();
-      Swal.fire({
-        title: 'Registrazione completata con successo!',
-        text: 'Ora puoi effettuare il login',
-        icon: 'success',
-      });
-          setTimeout(() => {
-          this.router.navigate(['../../pages/dashboard/dashboard.component.html']);
-      }, 500);
+  login(form: NgForm) {
+    // Chiamata al servizio di autenticazione con gestione asincrona del risultato
+    this.authSvc.login(form.value).subscribe(
+      (response) => {
+        // Se il login ha successo
+        Swal.fire({
+          title: 'Login effettuato con successo!',
+          icon: 'success',
+        });
 
-  } catch (error) {
-      Swal.fire({
-        title: 'Username o Password errati!',
-        text: 'Controlla i dati',
-        icon: 'error',
-      });
-    console.error(error);
-      this.router.navigate(['/login']);
-  }
+        // Reindirizza alla dashboard dopo un breve ritardo
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 500);
+      },
+      (error) => {
+        // Se il login fallisce
+        Swal.fire({
+          title: 'Username o Password errati!',
+          text: 'Controlla i dati',
+          icon: 'error',
+        });
+        console.error('Errore durante il login:', error);
+      }
+    );
   }
 
 }
