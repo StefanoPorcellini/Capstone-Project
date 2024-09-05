@@ -34,7 +34,7 @@ export class AuthService {
       .pipe(tap(data => {
         this.authSubject.next(data.user);
         localStorage.setItem('accessData', JSON.stringify(data));
-        this.autoLogout(new Date(data.expires));
+        this.autoLogout(new Date(data.expires)); // Passa la data di scadenza dalla risposta
       }));
   }
 

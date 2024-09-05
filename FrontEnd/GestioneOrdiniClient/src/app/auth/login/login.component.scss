@@ -1,0 +1,61 @@
+.container {
+  height: 100%;
+  width: 100%;
+}
+
+.hero {
+  padding: 60px 20px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.input {
+  padding: 1rem 1.2rem;
+  margin: 1rem;
+  border-radius: 2rem;
+  display: block;
+  width: 80%;
+  border: none;
+  box-shadow: inset 6px 6px 8px rgba(97, 97, 97, 0.075),
+    6px 6px 6px rgba(255, 255, 255, 0.781);
+  outline: none;
+  background-color: inherit;
+  color: rgb(161, 161, 161);
+  font-size: inherit;
+}
+
+.submit , .btn {
+  margin-top: 20px;
+  font-weight: bold;
+  box-shadow: -3px -3px 5px white, 3px 3px 5px rgba(209, 209, 209, 0.705);
+  color: rgb(112, 112, 112);
+  cursor: pointer;
+}
+
+.btn {
+  text-align: center;
+  color: black;
+}
+
+.logo {
+  width: 300px;
+  font-size: 3rem;
+  color: black;
+  font-weight: 600;
+  margin: 30px;
+}
+
+::placeholder {
+  color: rgb(161, 161, 161);
+}
