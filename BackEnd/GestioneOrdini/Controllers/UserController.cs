@@ -10,6 +10,7 @@ using System.Text;
 
 namespace GestioneOrdini.Controllers
 {
+    [Authorize(Roles ="Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -67,7 +68,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Metodo per ottenere un utente per ID
-        [HttpGet("{userId}")]
+        [HttpGet("getUserById/{userId}")]
         public async Task<IActionResult> GetUserById(int userId)
         {
             try

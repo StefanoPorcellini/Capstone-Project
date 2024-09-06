@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GestioneOrdini.Service
 {
+    
     public class UserService : IUserService
     {
         private readonly OrdersDbContext _context;
@@ -128,7 +129,7 @@ namespace GestioneOrdini.Service
                     .Include(u => u.Role)  // Include il ruolo nei risultati
                     .SingleOrDefaultAsync(u => u.Username == username);
 
-                if (user == null || !PasswordService.VerifyPassword(password, user.PasswordSalt, user.PasswordHash))
+                if (user == null || !PasswordService.VerifyPassword(password, user.PasswordSalt!, user.PasswordHash!))
                 {
                     return null;
                 }
@@ -154,7 +155,7 @@ namespace GestioneOrdini.Service
                 }
 
                 // Aggiorna il nome utente
-                user.Username = userViewModel.Username;
+                user.Username = userViewModel.Username!;
 
                 // Aggiorna la password solo se è stata fornita una nuova password
                 if (!string.IsNullOrEmpty(userViewModel.Password))

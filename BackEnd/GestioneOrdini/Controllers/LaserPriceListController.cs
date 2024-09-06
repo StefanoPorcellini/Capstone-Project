@@ -1,5 +1,6 @@
 ﻿using GestioneOrdini.Interface;
 using GestioneOrdini.Model.PriceList;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace GestioneOrdini.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles ="Admin, Owner")]
     public class LaserPriceListController : ControllerBase
     {
         private readonly ILaserPriceListService _laserPriceListService;
@@ -17,7 +19,7 @@ namespace GestioneOrdini.Controllers
             _laserPriceListService = laserPriceListService;
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateLaserPriceList([FromBody] LaserPriceList priceList)
         {
             if (ModelState.IsValid)
@@ -28,14 +30,16 @@ namespace GestioneOrdini.Controllers
             return BadRequest(ModelState);
         }
 
-        [HttpGet]
+        [HttpGet("getAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllLaserPriceLists()
         {
             var priceLists = await _laserPriceListService.GetAllLaserPriceListsAsync();
             return Ok(priceLists);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("getById/{id}")]
+        [Authorize]
         public async Task<IActionResult> GetLaserPriceListById(int id)
         {
             var priceList = await _laserPriceListService.GetLaserPriceListByIdAsync(id);
@@ -46,7 +50,7 @@ namespace GestioneOrdini.Controllers
             return NotFound();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateLaserPriceList(int id, [FromBody] LaserPriceList priceList)
         {
             if (id != priceList.Id)
@@ -62,7 +66,7 @@ namespace GestioneOrdini.Controllers
             return BadRequest(ModelState);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteLaserPriceList(int id)
         {
             await _laserPriceListService.DeleteLaserPriceListAsync(id);

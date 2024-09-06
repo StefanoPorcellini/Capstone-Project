@@ -1,5 +1,6 @@
 ﻿using GestioneOrdini.Interface;
 using GestioneOrdini.Model.Order;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace GestioneOrdini.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin, BackEnd")]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -18,7 +20,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Create an Order
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateOrder([FromBody] Order order)
         {
             if (ModelState.IsValid)
@@ -30,7 +32,8 @@ namespace GestioneOrdini.Controllers
         }
 
         // Get Order by ID
-        [HttpGet("{id}")]
+        [HttpGet("getById/{id}")]
+        [Authorize]
         public async Task<IActionResult> GetOrderById(int id)
         {
             var order = await _orderService.GetOrderByIdAsync(id);
@@ -42,7 +45,8 @@ namespace GestioneOrdini.Controllers
         }
 
         // Get all Orders
-        [HttpGet]
+        [HttpGet("getAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllOrders()
         {
             var orders = await _orderService.GetAllOrdersAsync();
@@ -51,6 +55,7 @@ namespace GestioneOrdini.Controllers
 
         // Get all Order Statuses
         [HttpGet("statuses")]
+        [Authorize]
         public async Task<IActionResult> GetAllOrderStatuses()
         {
             var statuses = await _orderService.GetAllOrderStatusesAsync();
@@ -58,7 +63,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Update an Order
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
         {
             if (id != order.Id)
@@ -75,7 +80,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Delete an Order
-        [HttpDelete("{id}")]
+        [HttpDelete("delate/{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
             await _orderService.DeleteOrderAsync(id);
@@ -99,6 +104,7 @@ namespace GestioneOrdini.Controllers
 
         // Update Order Status
         [HttpPut("{id}/status")]
+        [Authorize(Roles = "Admin, BackEnd, FrontEnd")]
         public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] int newStatusId)
         {
             try

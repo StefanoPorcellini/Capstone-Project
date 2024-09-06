@@ -1,5 +1,6 @@
 ﻿using GestioneOrdini.Interface;
 using GestioneOrdini.Model.Clients;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace GestioneOrdini.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin, FrontEnd")]
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
@@ -18,7 +20,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Create customer based on type
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerRequest request)
         {
             if (ModelState.IsValid)
@@ -47,7 +49,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Get all customers
-        [HttpGet]
+        [HttpGet("getAll")]
         public async Task<IActionResult> GetAllCustomers()
         {
             var customers = await _customerService.GetAllCustomersAsync();
@@ -55,7 +57,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Get customer by ID
-        [HttpGet("{id}")]
+        [HttpGet("getById/{id}")]
         public async Task<IActionResult> GetCustomerById(int id)
         {
             var customer = await _customerService.GetCustomerByIdAsync(id);
@@ -67,7 +69,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Update customer
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCustomer(int id, [FromBody] Customer customer)
         {
             if (id != customer.Id)
@@ -91,7 +93,7 @@ namespace GestioneOrdini.Controllers
         }
 
         // Delete customer
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             await _customerService.DeleteCustomerAsync(id);

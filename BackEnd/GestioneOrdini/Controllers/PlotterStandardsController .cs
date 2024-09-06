@@ -1,5 +1,6 @@
 ﻿using GestioneOrdini.Interface;
 using GestioneOrdini.Model.Order;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace GestioneOrdini.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles ="Admin, Owner")]
     public class PlotterStandardsController : ControllerBase
     {
         private readonly IGenericService<PlotterStandard> _plotterStandardService;
@@ -17,14 +19,15 @@ namespace GestioneOrdini.Controllers
             _plotterStandardService = plotterStandardService;
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<ActionResult<PlotterStandard>> CreatePlotterStandard(PlotterStandard plotterStandard)
         {
             var createdPlotterStandard = await _plotterStandardService.CreateAsync(plotterStandard);
             return CreatedAtAction(nameof(GetPlotterStandardById), new { id = createdPlotterStandard.Id }, createdPlotterStandard);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("getByid/{id}")]
+        [Authorize]
         public async Task<ActionResult<PlotterStandard>> GetPlotterStandardById(int id)
         {
             var plotterStandard = await _plotterStandardService.GetByIdAsync(id);
@@ -35,14 +38,15 @@ namespace GestioneOrdini.Controllers
             return Ok(plotterStandard);
         }
 
-        [HttpGet]
+        [HttpGet("getAll")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<PlotterStandard>>> GetAllPlotterStandards()
         {
             var plotterStandards = await _plotterStandardService.GetAllAsync();
             return Ok(plotterStandards);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdatePlotterStandard(int id, PlotterStandard plotterStandard)
         {
             if (id != plotterStandard.Id)
@@ -54,7 +58,7 @@ namespace GestioneOrdini.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeletePlotterStandard(int id)
         {
             await _plotterStandardService.DeleteAsync(id);
