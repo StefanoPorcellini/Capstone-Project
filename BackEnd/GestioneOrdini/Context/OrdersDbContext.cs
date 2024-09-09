@@ -18,7 +18,8 @@ namespace GestioneOrdini.Context
         public DbSet<LaserStandard> LaserStandards { get; set; }
         public DbSet<PlotterStandard> PlotterStandards { get; set; }
         public DbSet<LaserPriceList> LaserPriceLists { get; set; }
-        public DbSet<OrderStatus> OrderStatuses { get; set; } // Aggiunta la configurazione per OrderStatus
+        public DbSet<OrderStatus> OrderStatuses { get; set; }
+        public DbSet<WorkType> WorkTypes { get; set; } // Aggiungi la DbSet per WorkType
 
         public OrdersDbContext(DbContextOptions<OrdersDbContext> options) : base(options) { }
 
@@ -39,11 +40,12 @@ namespace GestioneOrdini.Context
                 .WithMany()
                 .HasForeignKey(u => u.RoleId);
 
-            // Configurazione delle entità Item per l'ereditarietà
+            // Rimuovi il discriminatore per Item (non serve più)
+            // Configura la relazione tra Item e WorkType
             modelBuilder.Entity<Item>()
-                .HasDiscriminator<string>("Discriminator")
-                .HasValue<LaserItem>("Laser")
-                .HasValue<PlotterItem>("Plotter");
+                .HasOne(i => i.Type) // Relazione tra Item e WorkType
+                .WithMany()
+                .HasForeignKey(i => i.WorkTypeId);
 
             // Configurazione per LaserItem
             modelBuilder.Entity<LaserItem>()
