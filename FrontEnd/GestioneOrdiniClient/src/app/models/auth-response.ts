@@ -1,7 +1,7 @@
-import { iAuthData } from './auth-data';
-import { iUser } from './user';
+
 export interface iAuthResponse {
-  accessToken:string,
-  user: iUser,
-  expires: Date
+  id: number,
+  token: string,
+  username: string,
+  expires: string
 }

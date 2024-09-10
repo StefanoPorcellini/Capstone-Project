@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { JwtInterceptor } from '@auth0/angular-jwt';
+import { AuthInterceptor } from './auth/auth-interceptor.interceptor';
 
 @NgModule({
   declarations: [
@@ -20,7 +20,7 @@ import { JwtInterceptor } from '@auth0/angular-jwt';
     NgbModule
   ],
   providers: [
-    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true}
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

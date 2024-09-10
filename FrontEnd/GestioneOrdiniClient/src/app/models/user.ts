@@ -3,3 +3,8 @@ export interface iUser {
   username: string,
   password: string
 }
+
+export interface iUserAuth {
+  id: number,
+  username: string
+}

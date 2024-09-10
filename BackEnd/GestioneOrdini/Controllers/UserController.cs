@@ -160,7 +160,8 @@ namespace GestioneOrdini.Controllers
 
                         return Ok(new LoginResponseModel
                         {
-                            Username = model.Username,
+                            Id = user.Id,
+                            Username = user.Username,
                             Expires = expiration,
                             Token = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(token)
                         });
