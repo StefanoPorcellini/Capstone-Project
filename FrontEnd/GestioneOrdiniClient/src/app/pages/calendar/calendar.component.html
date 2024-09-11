@@ -1,0 +1,55 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <button class="btn btn-primary" (click)="setView(CalendarView.Month)">Mese</button>
+    <button class="btn btn-primary" (click)="setView(CalendarView.Week)">Settimana</button>
+    <button class="btn btn-primary" (click)="setView(CalendarView.Day)">Giorno</button>
+  </div>
+
+  <div [ngSwitch]="view">
+    <mwl-calendar-month-view
+      *ngSwitchCase="CalendarView.Month"
+      [viewDate]="viewDate"
+      [events]="events"
+      [locale]="locale"
+      [weekStartsOn]="weekStartsOn"
+      [weekendDays]="weekendDays"
+      (eventClicked)="handleEvent('Clicked', $event.event)">
+    </mwl-calendar-month-view>
+    <mwl-calendar-week-view
+      *ngSwitchCase="CalendarView.Week"
+      [viewDate]="viewDate"
+      [events]="events"
+      [locale]="locale"
+      [weekStartsOn]="weekStartsOn"
+      [weekendDays]="weekendDays"
+      [dayStartHour]="8"
+      [dayEndHour]="20"
+      [hourSegments]="2"
+      [hourSegmentHeight]="30"
+      (eventClicked)="handleEvent('Clicked', $event.event)">
+      <ng-template #hourSegment let-hour="hour">
+        {{ hour | time24 }}
+      </ng-template>
+    </mwl-calendar-week-view>
+    <mwl-calendar-day-view
+      *ngSwitchCase="CalendarView.Day"
+      [viewDate]="viewDate"
+      [events]="events"
+      [locale]="locale"
+      [dayStartHour]="8"
+      [dayEndHour]="20"
+      [hourSegments]="2"
+      [hourSegmentHeight]="30"
+      (eventClicked)="handleEvent('Clicked', $event.event)">
+      <ng-template #hourSegment let-hour="hour">
+        {{ hour | time24 }}
+      </ng-template>
+    </mwl-calendar-day-view>
+  </div>
+</div>
+
+<ng-template #modalContent let-event="event">
+  <div class="modal-header">
+    <h4 class="modal-title">Evento: {{ event.title }}</h4>
+  </div>
+</ng-template>
