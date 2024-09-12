@@ -8,6 +8,7 @@ public class OrderService : IOrderService
 {
     private readonly OrdersDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly string _storagePath = "~/FileUpload"; 
 
     public OrderService(OrdersDbContext context, IHttpContextAccessor httpContextAccessor)
     {
@@ -15,10 +16,18 @@ public class OrderService : IOrderService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<Order> CreateOrderAsync(Order order)
+    public async Task<Order> CreateOrderAsync(Order order, IFormFile? file)
     {
         order.StatusId = 1;
         order.TotalAmount = await CalculateTotalAmountAsync(order);
+
+        // Upload del file durante la creazione dell'ordine
+        if (file != null)
+        {
+            var (fileName, filePath) = await UploadFileAsync(file);
+            order.Item.FileName = fileName;
+            order.Item.FilePath = filePath; // Salva il percorso completo
+        }
 
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
@@ -41,8 +50,16 @@ public class OrderService : IOrderService
             .ToListAsync();
     }
 
-    public async Task UpdateOrderAsync(Order order)
+    public async Task UpdateOrderAsync(Order order, IFormFile? file)
     {
+        // Aggiorna il file se fornito durante la modifica
+        if (file != null)
+        {
+            var (fileName, filePath) = await UploadFileAsync(file);
+            order.Item.FileName = fileName;
+            order.Item.FilePath = filePath; // Salva il percorso completo
+        }
+
         order.TotalAmount = await CalculateTotalAmountAsync(order);
         _context.Orders.Update(order);
         await _context.SaveChangesAsync();
@@ -50,9 +67,18 @@ public class OrderService : IOrderService
 
     public async Task DeleteOrderAsync(int id)
     {
-        var order = await _context.Orders.FindAsync(id);
+        var order = await _context.Orders
+            .Include(o => o.Item)
+            .FirstOrDefaultAsync(o => o.Id == id);
+
         if (order != null)
         {
+            // Cancella il file associato, se esistente
+            if (!string.IsNullOrEmpty(order.Item.FilePath) && File.Exists(order.Item.FilePath))
+            {
+                File.Delete(order.Item.FilePath);
+            }
+
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
         }
@@ -136,4 +162,26 @@ public class OrderService : IOrderService
     {
         return await _context.OrderStatuses.ToListAsync();
     }
+
+    // Logica per il caricamento del file
+    public async Task<(string fileName, string filePath)> UploadFileAsync(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            throw new Exception("File non valido.");
+        }
+
+        var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+        var filePath = Path.Combine(_storagePath, fileName);
+
+        Directory.CreateDirectory(_storagePath); // Assicura che la directory esista
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        return (fileName, filePath);
+    }
+
 }

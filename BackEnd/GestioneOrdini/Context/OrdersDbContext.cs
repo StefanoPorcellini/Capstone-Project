@@ -19,7 +19,7 @@ namespace GestioneOrdini.Context
         public DbSet<PlotterStandard> PlotterStandards { get; set; }
         public DbSet<LaserPriceList> LaserPriceLists { get; set; }
         public DbSet<OrderStatus> OrderStatuses { get; set; }
-        public DbSet<WorkType> WorkTypes { get; set; } // Aggiungi la DbSet per WorkType
+        public DbSet<WorkType> WorkTypes { get; set; }
 
         public OrdersDbContext(DbContextOptions<OrdersDbContext> options) : base(options) { }
 
@@ -40,12 +40,21 @@ namespace GestioneOrdini.Context
                 .WithMany()
                 .HasForeignKey(u => u.RoleId);
 
-            // Rimuovi il discriminatore per Item (non serve più)
             // Configura la relazione tra Item e WorkType
             modelBuilder.Entity<Item>()
-                .HasOne(i => i.Type) // Relazione tra Item e WorkType
+                .HasOne(i => i.Type) // Usa la proprietà WorkType per la navigazione
                 .WithMany()
-                .HasForeignKey(i => i.WorkTypeId);
+                .HasForeignKey(i => i.WorkTypeId)
+                .OnDelete(DeleteBehavior.Restrict); // Configura il comportamento di eliminazione se necessario
+
+            // Configura la proprietà per FileName e FilePath su Item
+            modelBuilder.Entity<Item>()
+                .Property(i => i.FileName)
+                .HasMaxLength(255); // Limite alla lunghezza del nome file
+
+            modelBuilder.Entity<Item>()
+                .Property(i => i.FilePath)
+                .HasMaxLength(255); // Limite alla lunghezza del percorso
 
             // Configurazione per LaserItem
             modelBuilder.Entity<LaserItem>()

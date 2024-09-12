@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin, BackEnd")]
+[Authorize]
+
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
@@ -17,19 +18,21 @@ public class OrderController : ControllerBase
 
     // Create an Order
     [HttpPost("create")]
-    public async Task<IActionResult> CreateOrder([FromBody] Order order)
+    [Authorize(Roles = "Admin, BackEnd")]
+
+    public async Task<IActionResult> CreateOrder([FromForm] OrderWithFileDto orderWithFile)
     {
         if (ModelState.IsValid)
         {
-            var createdOrder = await _orderService.CreateOrderAsync(order);
+            var createdOrder = await _orderService.CreateOrderAsync(orderWithFile.Order, orderWithFile.File);
             return CreatedAtAction(nameof(GetOrderById), new { id = createdOrder.Id }, createdOrder);
         }
         return BadRequest(ModelState);
     }
 
+
     // Get Order by ID
     [HttpGet("getById/{id}")]
-    [Authorize]
     public async Task<IActionResult> GetOrderById(int id)
     {
         var order = await _orderService.GetOrderByIdAsync(id);
@@ -42,7 +45,6 @@ public class OrderController : ControllerBase
 
     // Get all Orders
     [HttpGet("getAll")]
-    [Authorize]
     public async Task<IActionResult> GetAllOrders()
     {
         var orders = await _orderService.GetAllOrdersAsync();
@@ -51,7 +53,6 @@ public class OrderController : ControllerBase
 
     // Get all Order Statuses
     [HttpGet("statuses")]
-    [Authorize]
     public async Task<IActionResult> GetAllOrderStatuses()
     {
         var statuses = await _orderService.GetAllOrderStatusesAsync();
@@ -60,23 +61,27 @@ public class OrderController : ControllerBase
 
     // Update an Order
     [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
+    [Authorize(Roles = "Admin, BackEnd")]
+    public async Task<IActionResult> UpdateOrder(int id, [FromForm] OrderWithFileDto orderWithFile)
     {
-        if (id != order.Id)
+        if (id != orderWithFile.Order.Id)
         {
             return BadRequest("ID mismatch.");
         }
 
         if (ModelState.IsValid)
         {
-            await _orderService.UpdateOrderAsync(order);
+            await _orderService.UpdateOrderAsync(orderWithFile.Order, orderWithFile.File);
             return NoContent();
         }
         return BadRequest(ModelState);
     }
 
+
     // Delete an Order
     [HttpDelete("delete/{id}")] // Corretto il typo "delate" in "delete"
+    [Authorize(Roles = "Admin, BackEnd")]
+
     public async Task<IActionResult> DeleteOrder(int id)
     {
         await _orderService.DeleteOrderAsync(id);
@@ -85,6 +90,8 @@ public class OrderController : ControllerBase
 
     // Assign Order to Operator
     [HttpPost("{id}/assign")]
+    [Authorize(Roles = "Admin, BackEnd")]
+
     public async Task<IActionResult> AssignOrderToOperator(int id)
     {
         try

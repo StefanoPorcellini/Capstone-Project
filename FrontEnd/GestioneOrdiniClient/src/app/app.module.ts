@@ -11,7 +11,13 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AuthInterceptor } from './auth/auth-interceptor.interceptor';
 import { NavbarComponent } from './navbar/navbar/navbar.component';
-import { CalendarModule, DateAdapter } from 'angular-calendar';
+import {
+  CalendarModule,
+  DateAdapter,
+  CalendarNativeDateFormatter,
+  CalendarDateFormatter,
+  DateFormatterParams
+ } from 'angular-calendar';
 import { CalendarComponent } from './pages/calendar/calendar.component';
 import { Time24Pipe } from './pipe/time24.pipe';
 
@@ -30,15 +36,29 @@ registerLocaleData(localeIt);
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
-    CalendarModule.forRoot({
-      provide: DateAdapter,
-      useFactory: adapterFactory
-    })
-  ],
+    CalendarModule.forRoot(
+      {
+        provide: DateAdapter,
+        useFactory: adapterFactory,
+      },
+      {
+        dateFormatter: {
+          provide: CalendarDateFormatter,
+          useClass: AppModule,
+        },
+      }
+    ),  ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: LOCALE_ID, useValue: 'it-IT' }
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule extends CalendarNativeDateFormatter {
+  public override weekViewHour({ date, locale }: DateFormatterParams): string {
+    return new Intl.DateTimeFormat('it-IT', {
+      hour: 'numeric',
+      minute: 'numeric',
+    }).format(date);
+  }
+}

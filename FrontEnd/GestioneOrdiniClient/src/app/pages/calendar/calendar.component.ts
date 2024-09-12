@@ -8,6 +8,7 @@ import { subDays, startOfDay, addDays } from 'date-fns';
   styleUrls: ['./calendar.component.scss']
 })
 export class CalendarComponent {
+
   CalendarView = CalendarView;
 
   view: CalendarView = CalendarView.Month;

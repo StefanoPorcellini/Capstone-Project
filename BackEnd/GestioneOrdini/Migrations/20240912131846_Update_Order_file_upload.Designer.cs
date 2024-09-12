@@ -4,6 +4,7 @@ using GestioneOrdini.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestioneOrdini.Migrations
 {
     [DbContext(typeof(OrdersDbContext))]
-    partial class OrdersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240912131846_Update_Order_file_upload")]
+    partial class Update_Order_file_upload
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -379,13 +382,11 @@ namespace GestioneOrdini.Migrations
 
             modelBuilder.Entity("GestioneOrdini.Model.Order.Item", b =>
                 {
-                    b.HasOne("GestioneOrdini.Model.Order.WorkType", "Type")
+                    b.HasOne("GestioneOrdini.Model.Order.WorkType", null)
                         .WithMany()
                         .HasForeignKey("WorkTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.Order.Order", b =>
