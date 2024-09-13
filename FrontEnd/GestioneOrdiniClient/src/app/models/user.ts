@@ -6,5 +6,6 @@ export interface iUser {
 
 export interface iUserAuth {
   id: number,
-  username: string
+  username: string,
+  role: string
 }

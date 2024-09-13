@@ -1,7 +1,7 @@
+import { iUserAuth } from "./user";
 
 export interface iAuthResponse {
-  id: number,
   token: string,
-  username: string,
-  expires: string
+  expires: string,
+  userAuth: iUserAuth
 }

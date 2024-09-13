@@ -28,9 +28,9 @@
           <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
         </form>
         <div>
-          <i class="bi bi-person-circle"> Utente</i>
+          <i class="bi bi-person-circle"> {{ userAuth?.username }}</i>
         </div>
-        <button class="Btn-logout">
+        <button class="Btn-logout" (click)="logout()">
 
           <div class="sign"><svg viewBox="0 0 512 512">
               <path

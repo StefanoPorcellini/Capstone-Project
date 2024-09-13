@@ -158,13 +158,20 @@ namespace GestioneOrdini.Controllers
                             signingCredentials: creds
                         );
 
-                        return Ok(new LoginResponseModel
+                        var response = new LoginResponseModel
                         {
-                            Id = user.Id,
-                            Username = user.Username,
+                            Token = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(token),
                             Expires = expiration,
-                            Token = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(token)
-                        });
+                            UserAuth = new UserAuthViewModel
+                            {
+                                Id = user.Id,
+                                Username = user.Username,
+                                Role = user.Role.Name
+                            }
+                        };
+
+                        return Ok(response);
+
                     }
                     return Unauthorized(new { Message = "Invalid username or password." });
                 }

@@ -47,9 +47,10 @@ export class AuthService {
       .pipe(tap(data => {
         if (data && data.token) {
           console.log('Login data:', data); // Verifica i dati ricevuti
-          const user: iUserAuth =  { // Usa iUserAuth qui
-            id: data.id,
-            username: data.username
+          const user: iUserAuth =  { // Usa iUserAuth per recuperare i dati dal utente loggato
+            id: data.userAuth.id,
+            username: data.userAuth.username,
+            role: data.userAuth.role
           };
           this.authSubject.next(user); // Imposta l'utente
           // Verifica che i dati siano serializzati correttamente
@@ -94,19 +95,20 @@ export class AuthService {
   // Ripristina l'utente dal localStorage se esiste
   restoreUser(): void {
     const accessData = this.getAccessData();
-    if (!accessData || !accessData.username) {
+    if (!accessData || !accessData.userAuth.username) {
       console.log('No access data or user found');
       return;
     }
 
-    console.log('Restoring user:', accessData.username); // Verifica i dati
+    console.log('Restoring user:', accessData.userAuth.username); // Verifica i dati
     const expirationDate = new Date(accessData.expires);
     if (expirationDate <= new Date()) {
       this.logout(); // Logout se il token è scaduto
     } else {
       const user: iUserAuth =  {
-        id: accessData.id,
-        username: accessData.username
+        id: accessData.userAuth.id,
+        username: accessData.userAuth.username,
+        role: accessData.userAuth.role
       }
       this.authSubject.next(user); // Ripristina l'utente
       this.autoLogout(expirationDate); // Imposta l'auto logout
