@@ -34,16 +34,17 @@ export class AuthService {
     this.restoreUser(); // Prova a ripristinare l'utente dallo storage locale
   }
 
-  private userUrl = `${environment.userUrl}`;
+  // URL per le API utente
+  private userUrl = environment.baseUrl;
 
   // Metodo per creare un nuovo utente
   create(newUser: Partial<iUser>): Observable<iAuthResponse> {
-    return this.http.post<iAuthResponse>(`${this.userUrl}/create`, newUser);
+    return this.http.post<iAuthResponse>(`${this.userUrl}/User/create`, newUser);
   }
 
   // Metodo per effettuare il login
   login(authData: iAuthData): Observable<iAuthResponse> {
-    return this.http.post<iAuthResponse>(`${this.userUrl}/login`, authData)
+    return this.http.post<iAuthResponse>(`${this.userUrl}/User/login`, authData)
       .pipe(tap(data => {
         if (data && data.token) {
           console.log('Login data:', data); // Verifica i dati ricevuti
