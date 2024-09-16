@@ -3,6 +3,19 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
 </div>
 <div class="modal-body">
+  <div>
+    <h5 *ngIf="selectedUser">Modifica Utente</h5>
+    <h5 *ngIf="!selectedUser">Crea Nuovo Utente</h5>
+    <input type="text" [(ngModel)]="newUsername" placeholder="Username" />
+    <input type="password" [(ngModel)]="newPassword" placeholder="Password" />
+    <select [(ngModel)]="newRoleName">
+      <option value="" disabled selected>Seleziona Ruolo</option>
+      <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
+    </select>
+    <button (click)="selectedUser ? updateUser() : createUser()">
+      {{ selectedUser ? 'Aggiorna' : 'Crea' }}
+    </button>
+  </div>
   <table class="table">
     <thead>
       <tr>
@@ -12,9 +25,9 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of users"> <!-- Assicurati che ngFor sia corretto -->
+      <tr *ngFor="let user of users">
         <td>{{ user.username }}</td>
-        <td>{{ user.roleName}}</td>
+        <td>{{ user.roleId }}</td> <!-- Assicurati di mostrare il nome del ruolo -->
         <td>
           <button (click)="editUser(user)">Modifica</button>
           <button (click)="deleteUser(user.id)">Elimina</button>

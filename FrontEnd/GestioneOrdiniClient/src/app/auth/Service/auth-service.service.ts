@@ -51,7 +51,7 @@ export class AuthService {
           const user: iUserAuth =  { // Usa iUserAuth per recuperare i dati dal utente loggato
             id: data.userAuth.id,
             username: data.userAuth.username,
-            role: data.userAuth.role
+            roleId: data.userAuth.roleId
           };
           this.authSubject.next(user); // Imposta l'utente
           // Verifica che i dati siano serializzati correttamente
@@ -109,7 +109,7 @@ export class AuthService {
       const user: iUserAuth =  {
         id: accessData.userAuth.id,
         username: accessData.userAuth.username,
-        role: accessData.userAuth.role
+        roleId: accessData.userAuth.roleId
       }
       this.authSubject.next(user); // Ripristina l'utente
       this.autoLogout(expirationDate); // Imposta l'auto logout

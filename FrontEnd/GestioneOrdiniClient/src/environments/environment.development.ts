@@ -4,9 +4,9 @@ export const environment = {
     create: 'User/Create',
     login: 'User/Login',
     all: 'User/all',
-    getUserById: (userId: string) => `/getUserById/${userId}`,
-    update: (userId: string) => `/update/${userId}`,
-    delete: (userId: string) => `/delete/${userId}`,
-    roles: 'User/GetUsers',
+    getUserById: (userId: number) => `User/getUserById/${userId}`,
+    update: (userId: number) => `User/update/${userId}`,
+    delete: (userId: number) => `User/delete/${userId}`,
+    roles: 'User/roles',
   },
 };

@@ -20,6 +20,7 @@ import {
  } from 'angular-calendar';
 import { CalendarComponent } from './pages/calendar/calendar.component';
 import { Time24Pipe } from './pipe/time24.pipe';
+import { FormsModule } from '@angular/forms';
 
 registerLocaleData(localeIt);
 
@@ -30,10 +31,11 @@ registerLocaleData(localeIt);
     NavbarComponent,
     CalendarComponent,
     Time24Pipe,
-    UserModal
+    UserModal,
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
