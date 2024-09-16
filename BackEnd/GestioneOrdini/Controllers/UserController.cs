@@ -141,10 +141,10 @@ namespace GestioneOrdini.Controllers
                     if (user != null)
                     {
                         var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.Name, user.Username),
-                            new Claim(ClaimTypes.Role, user.RoleId.ToString())
-                        };
+                {
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, user.Role.Name)  // Memorizza il nome del ruolo, non l'ID
+                };
 
                         var key = new SymmetricSecurityKey(_key);
                         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -166,12 +166,11 @@ namespace GestioneOrdini.Controllers
                             {
                                 Id = user.Id,
                                 Username = user.Username,
-                                Role = user.Role.Name
+                                Role = user.Role.Name  // Passa il nome del ruolo nella risposta
                             }
                         };
 
                         return Ok(response);
-
                     }
                     return Unauthorized(new { Message = "Invalid username or password." });
                 }

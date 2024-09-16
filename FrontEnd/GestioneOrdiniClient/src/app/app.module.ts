@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { registerLocaleData } from '@angular/common';
 import localeIt from '@angular/common/locales/it';
-
+import { UserModal } from './modals/user-modal/user-modal.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -30,6 +30,7 @@ registerLocaleData(localeIt);
     NavbarComponent,
     CalendarComponent,
     Time24Pipe,
+    UserModal
   ],
   imports: [
     BrowserModule,

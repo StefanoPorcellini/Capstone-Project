@@ -3,7 +3,7 @@ export const environment = {
   userapi: {
     create: 'User/Create',
     login: 'User/Login',
-    all: 'User/GetAll',
+    all: 'User/all',
     getUserById: (userId: string) => `/getUserById/${userId}`,
     update: (userId: string) => `/update/${userId}`,
     delete: (userId: string) => `/delete/${userId}`,

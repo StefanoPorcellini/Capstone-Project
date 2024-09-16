@@ -2,6 +2,8 @@ import Swal from 'sweetalert2';
 import { AuthService } from '../../auth/Service/auth-service.service';
 import { iUserAuth } from './../../models/user';
 import { Component } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UserModal } from '../../modals/user-modal/user-modal.component'; // Assicurati di importare il tuo UserModal
 
 @Component({
   selector: 'app-navbar',
@@ -10,7 +12,7 @@ import { Component } from '@angular/core';
 })
 export class NavbarComponent {
 
-  constructor(private authSvc: AuthService){}
+  constructor(private authSvc: AuthService, private modalService: NgbModal) {}
 
   userAuth: iUserAuth | null = null;
 
@@ -45,5 +47,9 @@ export class NavbarComponent {
         );
       }
     });
+  }
+
+  openUserModal() {
+    const modalRef = this.modalService.open(UserModal, { centered: true }); // Aggiunto l'opzione 'centered'
   }
 }
