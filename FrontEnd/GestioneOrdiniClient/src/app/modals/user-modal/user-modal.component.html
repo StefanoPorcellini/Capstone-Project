@@ -27,7 +27,7 @@
     <tbody>
       <tr *ngFor="let user of users">
         <td>{{ user.username }}</td>
-        <td>{{ user.roleId }}</td> <!-- Assicurati di mostrare il nome del ruolo -->
+        <td>{{ user.roleName}}</td>
         <td>
           <button (click)="editUser(user)">Modifica</button>
           <button (click)="deleteUser(user.id)">Elimina</button>

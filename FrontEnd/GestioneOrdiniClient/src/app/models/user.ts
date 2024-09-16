@@ -7,7 +7,8 @@ export interface iUser {
 export interface iUserAuth {
   id: number,
   username: string,
-  roleId: number
+  roleId: number,
+  roleName?: string
 }
 
 export interface iUserAuthWithRole {
