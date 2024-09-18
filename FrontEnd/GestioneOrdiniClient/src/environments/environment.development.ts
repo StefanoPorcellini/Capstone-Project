@@ -9,11 +9,12 @@ export const environment = {
     delete: (userId: number) => `User/delete/${userId}`,
     roles: 'User/roles',
   },
-  customerapi: {
-    create:'Customer/create',
-    getAll:'Customer/getAll',
-    getById: (id: number) => `Customer/getById/${id}`,
-    update: (id: number) => `Customer/update/${id}`,
-    delate: (id: number) => `Customer/delate/${id}`
-  }
+  standardApi: {
+    create: (url:string) => `${url}/create`,
+    getAll: (url:string) => `${url}/getAll`,
+    getById: (url:string, id: number) => `${url}/getById/${id}`,
+    update: (url:string, id: number) => `${url}/update/${id}`,
+    delete: (url:string, id: number) => `${url}/delate/${id}`
+  },
+
 };

@@ -1,1 +1,105 @@
-<p>price-list works!</p>
+<div class="modal-header">
+  <h4 class="modal-title">Listini Prezzi</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body">
+  <div class="custom-radio">
+    <div>
+      <label for="laserPriceListRadio">
+        <input type="radio" name="listType" id="laserPriceListRadio" value="laserPriceList"
+          (change)="onListChange('laserPriceList')" checked>
+        Listino Prezzi Laser
+      </label>
+    </div>
+    <div>
+      <label for="laserStandardRadio">
+        <input type="radio" name="listType" id="laserStandardRadio" value="laserStandard"
+          (change)="onListChange('laserStandard')">
+        Listino Prezzi Laser Standard
+      </label>
+    </div>
+    <div>
+      <label for="plotterStandardRadio">
+        <input type="radio" name="listType" id="plotterStandardRadio" value="plotterStandard"
+          (change)="onListChange('plotterStandard')">
+        Listino Prezzi Plotter
+      </label>
+    </div>
+  </div>
+
+  <!-- Tabella per Listino Prezzi Laser -->
+  <div *ngIf="selectedList === 'laserPriceList'">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="text-end">Unit Price</th>
+          <th>Quantity Range</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of laserPriceList">
+          <td>{{ item.description }}</td>
+          <td><strong>{{ item.unitPrice | currency:'EUR' }}</strong></td>
+          <td class="text-end">{{ item.minQuantity }} - {{ item.maxQuantity }}</td>
+          <td class="d-flex justify-content-end gap-2">
+            <button class="btn btn-warning btn-sm" (click)="editItem('laserPriceList', item.id, item)"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-danger btn-sm" (click)="deleteItem('laserPriceList', item.id)"><i class="bi bi-pencil-square"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tabella per Listino Prezzi Laser Standard -->
+  <div *ngIf="selectedList === 'laserStandard'">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="text-end">Price</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of laserStandard">
+          <td>{{ item.description }}</td>
+          <td class="text-end"><strong>{{ item.price  | currency:'EUR' }}</strong></td>
+          <td class="d-flex justify-content-end gap-2">
+            <button class="btn btn-warning btn-sm" (click)="editItem('laserStandard', item.id, item)"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-danger btn-sm" (click)="deleteItem('laserStandard', item.id)"><i class="bi bi-pencil-square"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tabella per Listino Prezzi Plotter -->
+  <div *ngIf="selectedList === 'plotterStandard'">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="text-end">Price</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of plotterStandard">
+          <td>{{ item.description }}</td>
+          <td class="text-end"><strong>{{ item.price  | currency:'EUR' }}</strong></td>
+          <td class="d-flex justify-content-end gap-2">
+            <button class="btn btn-warning btn-sm" (click)="editItem('plotterStandard', item.id, item)"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-danger btn-sm" (click)="deleteItem('plotterStandard', item.id)"><i class="bi bi-pencil-square"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Close</button>
+</div>

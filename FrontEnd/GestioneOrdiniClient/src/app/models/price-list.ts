@@ -9,12 +9,12 @@ export interface iLaserPriceList {
 
 export interface iLaserStandard {
   id: number;
-  descripiton: string;
+  description: string;
   price: number;
 }
 
 export interface iPlotterStandard {
   id: number;
-  descripiton: string;
+  description: string;
   price: number;
 }

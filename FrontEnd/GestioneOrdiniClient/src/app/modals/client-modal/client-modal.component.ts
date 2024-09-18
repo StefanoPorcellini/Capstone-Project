@@ -12,6 +12,8 @@ import { environment } from '../../../environments/environment.development';
 })
 export class ClientModal {
 
+  url: string = 'Customer'
+
   customers: iCustomer[] = [];   // Utilizzo dell'interfaccia Customer
   newCustomer: iCustomer = {
     customerType: 'private',
@@ -23,7 +25,7 @@ export class ClientModal {
     partitaIVA: '',
     ragioneSociale: ''
   };
-  
+
   showCreateCustomerForm: boolean = false;
 
   constructor(public activeModal: NgbActiveModal, private http: HttpClient) {}
@@ -33,7 +35,7 @@ export class ClientModal {
   }
 
   loadCustomers() {
-    this.http.get(`${environment.baseUrl}/${environment.customerapi.getAll}`).subscribe((response: any) => {
+    this.http.get(`${environment.baseUrl}/${environment.standardApi.getAll(this.url)}`).subscribe((response: any) => {
       console.log('clienti:',response); // Verifica i dati ricevuti
       this.customers = response;
     });
@@ -48,20 +50,20 @@ export class ClientModal {
       delete customerData.cf;
     }
 
-    this.http.post(`${environment.baseUrl}/${environment.customerapi.create}`, customerData).subscribe(() => {
+    this.http.post(`${environment.baseUrl}/${environment.standardApi.create(this.url)}`, customerData).subscribe(() => {
       this.loadCustomers();
       this.resetForm();
     });
   }
 
   updateCustomer(customer: any) {
-    this.http.put(`${environment.baseUrl}/${environment.customerapi.update(customer.id)}`, customer).subscribe(() => {
+    this.http.put(`${environment.baseUrl}/${environment.standardApi.update(this.url, customer.id)}`, customer).subscribe(() => {
       this.loadCustomers();
     });
   }
 
   deleteCustomer(id: number) {
-    this.http.delete(`${environment.baseUrl}/${environment.customerapi.delate(id)}`).subscribe(() => {
+    this.http.delete(`${environment.baseUrl}/${environment.standardApi.delete(this.url, id)}`).subscribe(() => {
       this.loadCustomers();
     });
   }

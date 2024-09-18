@@ -5,6 +5,7 @@ import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserModal } from '../../modals/user-modal/user-modal.component'; // Assicurati di importare il tuo UserModal
 import { ClientModal } from '../../modals/client-modal/client-modal.component';
+import { PriceList } from '../../modals/price-list/price-list.component';
 
 @Component({
   selector: 'app-navbar',
@@ -56,5 +57,9 @@ export class NavbarComponent {
 
   openClientModal(){
     const clentModalRef = this.modalService.open(ClientModal,{centered: true, size: 'xl', scrollable: true})
+  }
+
+  openPriceListModal(){
+    const clentModalRef = this.modalService.open(PriceList,{centered: true, size: 'xl', scrollable: true})
   }
 }

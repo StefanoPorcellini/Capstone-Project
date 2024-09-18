@@ -25,7 +25,7 @@
         <td>{{ customer.email }}</td>
         <td>{{ customer.tel }}</td>
         <td>{{ customer.customerType === 'private' ? customer.cf : customer.partitaIVA }}</td>
-        <td class="d-flex justify-content-center gap-2">
+        <td class="d-flex justify-content-end gap-2">
           <button class="btn btn-warning" (click)="updateCustomer(customer)"><i class="bi bi-pencil-square"></i></button>
           <button class="btn btn-danger" (click)="deleteCustomer(customer.id!)"><i class="bi bi-trash"></i></button>
         </td>
