@@ -11,7 +11,6 @@ namespace GestioneOrdini.Model.ViewModel
         [DataType(DataType.Password)]
         public string? Password { get; set; }
 
-        [Required]
         public string RoleName { get; set; } // Il nome del ruolo selezionato
     }
 }

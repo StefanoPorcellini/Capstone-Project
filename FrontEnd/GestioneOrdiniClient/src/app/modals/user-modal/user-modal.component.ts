@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
 import { iUserAuth } from '../../models/user'; // Importa i modelli esistenti
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-user-modal',
@@ -57,12 +58,14 @@ export class UserModal implements OnInit {
     };
     this.http.post<iUserAuth>(`${environment.baseUrl}/${environment.userapi.create}`, newUser).subscribe(
       data => {
-        this.users.push(data); // Aggiungi il nuovo utente alla lista
+        this.loadUsers();
         this.resetForm(); // Resetta il modulo
-        console.log('Utente creato:', data);
+        Swal.fire('Successo', 'Utente creato con successo!', 'success'); // SweetAlert di successo
+        console.log('Utente creato:', data, this.users);
       },
       error => {
         console.error('Errore nella creazione dell\'utente:', error);
+        Swal.fire('Errore', 'C\'è stato un errore nella creazione dell\'utente.', 'error'); // SweetAlert di errore
       }
     );
   }
@@ -75,37 +78,64 @@ export class UserModal implements OnInit {
 
   updateUser() {
     if (this.selectedUser) {
-      const updatedUser = {
-        username: this.newUsername,
-        password: this.newPassword, // Se necessario, includi la password
-        roleName: this.newRoleName
-      };
-      this.http.put<iUserAuth>(`${environment.baseUrl}/${environment.userapi.update(this.selectedUser.id)}`, updatedUser).subscribe(
-        data => {
-          const index = this.users.findIndex(u => u.id === data.id);
-          if (index !== -1) {
-            this.users[index] = data; // Aggiorna l'utente nella lista
-          }
-          this.resetForm(); // Resetta il modulo
-          console.log('Utente aggiornato:', data);
-        },
-        error => {
-          console.error('Errore nell\'aggiornamento dell\'utente:', error);
+      Swal.fire({
+        title: 'Sei sicuro?',
+        text: 'Vuoi aggiornare questo utente?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sì, aggiorna!',
+        cancelButtonText: 'Annulla'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const updatedUser = {
+            username: this.newUsername,
+            password: this.newPassword, // Se necessario, includi la password
+            roleName: this.newRoleName  // Assicurati che newRoleName sia correttamente valorizzato
+          };
+
+          this.http.put<iUserAuth>(`${environment.baseUrl}/${environment.userapi.update(this.selectedUser!.id)}`, updatedUser).subscribe(
+            data => {
+              const index = this.users.findIndex(u => u.id === data.id);
+              if (index !== -1) {
+                this.users[index] = data; // Aggiorna l'utente nella lista
+              }
+              this.resetForm(); // Resetta il modulo
+              Swal.fire('Aggiornato!', 'L\'utente è stato aggiornato.', 'success'); // SweetAlert di successo
+              console.log('Utente aggiornato:', data);
+            },
+            error => {
+              console.error('Errore nell\'aggiornamento dell\'utente:', error);
+              Swal.fire('Errore', 'C\'è stato un errore nell\'aggiornamento dell\'utente.', 'error'); // SweetAlert di errore
+            }
+          );
         }
-      );
+      });
     }
   }
 
   deleteUser(userId: number) {
-    this.http.delete(`${environment.baseUrl}/${environment.userapi.delete(userId)}`).subscribe(
-      () => {
-        this.users = this.users.filter(user => user.id !== userId); // Rimuovi l'utente dalla lista
-        console.log('Utente eliminato:', userId);
-      },
-      error => {
-        console.error('Errore nell\'eliminazione dell\'utente:', error);
+    Swal.fire({
+      title: 'Sei sicuro?',
+      text: 'Vuoi eliminare questo utente?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sì, elimina!',
+      cancelButtonText: 'Annulla'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.http.delete(`${environment.baseUrl}/${environment.userapi.delete(userId)}`).subscribe(
+          () => {
+            this.users = this.users.filter(user => user.id !== userId); // Rimuovi l'utente dalla lista
+            Swal.fire('Eliminato!', 'L\'utente è stato eliminato.', 'success'); // SweetAlert di successo
+            console.log('Utente eliminato:', userId);
+          },
+          error => {
+            console.error('Errore nell\'eliminazione dell\'utente:', error);
+            Swal.fire('Errore', 'C\'è stato un errore nell\'eliminazione dell\'utente.', 'error'); // SweetAlert di errore
+          }
+        );
       }
-    );
+    });
   }
 
   resetForm() {

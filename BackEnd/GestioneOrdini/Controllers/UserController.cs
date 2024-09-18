@@ -36,8 +36,17 @@ namespace GestioneOrdini.Controllers
             {
                 try
                 {
-                    await _userService.CreateUserAsync(model);
-                    return Ok(new { Message = "User created successfully." });
+                    var newUser = await _userService.CreateUserAsync(model); // Ottieni il nuovo utente creato
+                    var userViewModel = new UserViewModel
+                    {
+                        Id = newUser.Id,
+                        Username = newUser.Username,
+                        RoleName = newUser.Role.Name
+                    };
+                    return Ok(new {
+                        Message = "User created successfully.",
+                        User = userViewModel  // Includi il nuovo utente nella risposta
+                    });
                 }
                 catch (ArgumentException ex)
                 {
