@@ -55,6 +55,6 @@ export class NavbarComponent {
   }
 
   openClientModal(){
-    const clentModalRef = this.modalService.open(ClientModal,{centered: true, fullscreen: true, scrollable: true})
+    const clentModalRef = this.modalService.open(ClientModal,{centered: true, size: 'xl', scrollable: true})
   }
 }

@@ -11,6 +11,7 @@
 
         public  string? PartitaIVA { get; set; }
         public  string? RagioneSociale { get; set; }
+        public string CustomerType { get; set }
 
     }
 }

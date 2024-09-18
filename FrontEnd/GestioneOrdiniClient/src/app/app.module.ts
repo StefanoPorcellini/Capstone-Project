@@ -22,7 +22,7 @@ import { CalendarComponent } from './pages/calendar/calendar.component';
 import { Time24Pipe } from './pipe/time24.pipe';
 import { FormsModule } from '@angular/forms';
 import { ClientModal } from './modals/client-modal/client-modal.component';
-import { PriceListComponent } from './modals/price-list/price-list.component';
+import { PriceList } from './modals/price-list/price-list.component';
 
 registerLocaleData(localeIt);
 
@@ -35,7 +35,7 @@ registerLocaleData(localeIt);
     Time24Pipe,
     UserModal,
     ClientModal,
-    PriceListComponent
+    PriceList
   ],
   imports: [
     BrowserModule,

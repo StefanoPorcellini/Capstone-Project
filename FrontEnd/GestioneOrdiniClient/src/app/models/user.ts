@@ -11,8 +11,4 @@ export interface iUserAuth {
   roleName?: string
 }
 
-export interface iUserAuthWithRole {
-  id: number,
-  username: string,
-  role: string
-}
+

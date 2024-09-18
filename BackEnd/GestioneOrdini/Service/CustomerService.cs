@@ -176,7 +176,9 @@ namespace GestioneOrdini.Service
                     Email = company.Email,
                     Tel = company.Tel,
                     PartitaIVA = company.PartitaIVA,
-                    RagioneSociale = company.RagioneSociale
+                    RagioneSociale = company.RagioneSociale,
+                    CustomerType = "company"
+
                 };
             }
             else if (customer is CustomerPrivate privato)
@@ -188,7 +190,8 @@ namespace GestioneOrdini.Service
                     Address = privato.Address,
                     Email = privato.Email,
                     Tel = privato.Tel,
-                    CF = privato.CF
+                    CF = privato.CF,
+                    CustomerType = "private"
                 };
             }
             else
@@ -199,7 +202,8 @@ namespace GestioneOrdini.Service
                     Name = customer.Name,
                     Address = customer.Address,
                     Email = customer.Email,
-                    Tel = customer.Tel
+                    Tel = customer.Tel,
+
                 };
             }
         }

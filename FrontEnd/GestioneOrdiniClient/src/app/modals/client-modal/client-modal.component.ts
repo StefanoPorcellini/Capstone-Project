@@ -23,6 +23,8 @@ export class ClientModal {
     partitaIVA: '',
     ragioneSociale: ''
   };
+  
+  showCreateCustomerForm: boolean = false;
 
   constructor(public activeModal: NgbActiveModal, private http: HttpClient) {}
 
@@ -76,4 +78,9 @@ export class ClientModal {
       ragioneSociale: ''
     };
   }
+
+  toggleCreateCustomerForm() {
+    this.showCreateCustomerForm = !this.showCreateCustomerForm;
+  }
+
 }

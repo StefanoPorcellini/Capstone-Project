@@ -4,53 +4,9 @@
 </div>
 
 <div class="modal-body">
-  <!-- Form di creazione cliente -->
-  <h5>Nuovo Cliente</h5>
-  <form (submit)="createCustomer()">
-    <div class="mb-3">
-      <label for="customerType">Tipo Cliente</label><br>
-      <input type="radio" id="private" name="customerType" [(ngModel)]="newCustomer.customerType" value="private"> Privato
-      <input type="radio" id="company" name="customerType" [(ngModel)]="newCustomer.customerType" value="company"> Azienda
-    </div>
-    <div class="mb-3">
-      <label for="name">Nome</label>
-      <input type="text" id="name" [(ngModel)]="newCustomer.name" name="name" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label for="address">Indirizzo</label>
-      <input type="text" id="address" [(ngModel)]="newCustomer.address" name="address" class="form-control">
-    </div>
-    <div class="mb-3">
-      <label for="email">Email</label>
-      <input type="email" id="email" [(ngModel)]="newCustomer.email" name="email" class="form-control">
-    </div>
-    <div class="mb-3">
-      <label for="tel">Telefono</label>
-      <input type="text" id="tel" [(ngModel)]="newCustomer.tel" name="tel" class="form-control">
-    </div>
-
-    <!-- Solo per privati -->
-    <div *ngIf="newCustomer.customerType === 'private'" class="mb-3">
-      <label for="cf">Codice Fiscale</label>
-      <input type="text" id="cf" [(ngModel)]="newCustomer.cf" name="cf" class="form-control">
-    </div>
-
-    <!-- Solo per aziende -->
-    <div *ngIf="newCustomer.customerType === 'company'" class="mb-3">
-      <label for="partitaIVA">Partita IVA</label>
-      <input type="text" id="partitaIVA" [(ngModel)]="newCustomer.partitaIVA" name="partitaIVA" class="form-control">
-    </div>
-    <div *ngIf="newCustomer.customerType === 'company'" class="mb-3">
-      <label for="ragioneSociale">Ragione Sociale</label>
-      <input type="text" id="ragioneSociale" [(ngModel)]="newCustomer.ragioneSociale" name="ragioneSociale" class="form-control">
-    </div>
-
-    <button type="submit" class="btn btn-primary">Crea Cliente</button>
-  </form>
-
   <!-- Tabella clienti -->
-  <h5 class="mt-4">Clienti Esistenti</h5>
-  <table class="table table-bordered">
+  <h5>Clienti Esistenti</h5>
+  <table class="table table-hover">
     <thead>
       <tr>
         <th>Nome</th>
@@ -62,7 +18,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let customer of customers">
+      <tr *ngFor="let customer of customers"
+          [ngClass]="{'table-info': customer.customerType === 'private', 'table-warning': customer.customerType === 'company'}">
         <td>{{ customer.name }}</td>
         <td>{{ customer.address }}</td>
         <td>{{ customer.email }}</td>
@@ -75,6 +32,57 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- Pulsante per mostrare/nascondere il modulo di creazione -->
+  <button class="btn btn-primary mt-3" (click)="toggleCreateCustomerForm()">
+    {{ showCreateCustomerForm ? 'Nascondi' : 'Crea Nuovo Cliente' }}
+  </button>
+
+  <!-- Form di creazione cliente -->
+  <div *ngIf="showCreateCustomerForm" class="mt-4">
+    <h5>Nuovo Cliente</h5>
+    <form (submit)="createCustomer()">
+      <div class="mb-3">
+        <label for="customerType">Tipo Cliente</label><br>
+        <input type="radio" id="private" name="customerType" [(ngModel)]="newCustomer.customerType" value="private"> Privato
+        <input type="radio" id="company" name="customerType" [(ngModel)]="newCustomer.customerType" value="company"> Azienda
+      </div>
+      <div class="mb-3">
+        <label for="name">Nome</label>
+        <input type="text" id="name" [(ngModel)]="newCustomer.name" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="address">Indirizzo</label>
+        <input type="text" id="address" [(ngModel)]="newCustomer.address" name="address" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="email">Email</label>
+        <input type="email" id="email" [(ngModel)]="newCustomer.email" name="email" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="tel">Telefono</label>
+        <input type="text" id="tel" [(ngModel)]="newCustomer.tel" name="tel" class="form-control">
+      </div>
+
+      <!-- Solo per privati -->
+      <div *ngIf="newCustomer.customerType === 'private'" class="mb-3">
+        <label for="cf">Codice Fiscale</label>
+        <input type="text" id="cf" [(ngModel)]="newCustomer.cf" name="cf" class="form-control">
+      </div>
+
+      <!-- Solo per aziende -->
+      <div *ngIf="newCustomer.customerType === 'company'" class="mb-3">
+        <label for="partitaIVA">Partita IVA</label>
+        <input type="text" id="partitaIVA" [(ngModel)]="newCustomer.partitaIVA" name="partitaIVA" class="form-control">
+      </div>
+      <div *ngIf="newCustomer.customerType === 'company'" class="mb-3">
+        <label for="ragioneSociale">Ragione Sociale</label>
+        <input type="text" id="ragioneSociale" [(ngModel)]="newCustomer.ragioneSociale" name="ragioneSociale" class="form-control">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Crea Cliente</button>
+    </form>
+  </div>
 </div>
 
 <div class="modal-footer">
