@@ -4,6 +4,7 @@ import { iUserAuth } from './../../models/user';
 import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserModal } from '../../modals/user-modal/user-modal.component'; // Assicurati di importare il tuo UserModal
+import { ClientModal } from '../../modals/client-modal/client-modal.component';
 
 @Component({
   selector: 'app-navbar',
@@ -50,6 +51,10 @@ export class NavbarComponent {
   }
 
   openUserModal() {
-    const modalRef = this.modalService.open(UserModal, { centered: true }); // Aggiunto l'opzione 'centered'
+    const userModalRef = this.modalService.open(UserModal, { centered: true }); // Aggiunto l'opzione 'centered'
+  }
+
+  openClientModal(){
+    const clentModalRef = this.modalService.open(ClientModal,{centered: true, fullscreen: true, scrollable: true})
   }
 }

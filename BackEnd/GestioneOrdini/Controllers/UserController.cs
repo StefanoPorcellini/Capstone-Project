@@ -44,7 +44,7 @@ namespace GestioneOrdini.Controllers
                         RoleName = newUser.Role.Name
                     };
                     return Ok(new {
-                        Message = "User created successfully.",
+                        //Message = "User created successfully.",
                         User = userViewModel  // Includi il nuovo utente nella risposta
                     });
                 }

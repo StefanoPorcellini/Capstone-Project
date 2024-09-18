@@ -1,4 +1,5 @@
 ﻿using GestioneOrdini.Model.Clients;
+using GestioneOrdini.Model.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace GestioneOrdini.Interface
                     (string customerType, string name, string address, string email, string tel, string? cf = null, string? partitaIVA = null,
                     string? ragioneSociale = null);
         Task<Customer> GetCustomerByIdAsync(int customerId);
-        Task<IEnumerable<Customer>> GetAllCustomersAsync();
+        Task<IEnumerable<CustomerViewModel>> GetAllCustomersAsync();
         Task UpdateCustomerAsync(Customer customer);
         Task DeleteCustomerAsync(int customerId);
 

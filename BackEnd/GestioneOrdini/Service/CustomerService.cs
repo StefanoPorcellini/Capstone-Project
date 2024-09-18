@@ -1,6 +1,7 @@
 ﻿using GestioneOrdini.Context;
 using GestioneOrdini.Interface;
 using GestioneOrdini.Model.Clients;
+using GestioneOrdini.Model.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace GestioneOrdini.Service
         {
             Customer customer;
 
-            if (customerType == "Company")
+            if (customerType == "company")
             {
                 if (string.IsNullOrWhiteSpace(partitaIVA) || string.IsNullOrWhiteSpace(ragioneSociale))
                 {
@@ -42,7 +43,7 @@ namespace GestioneOrdini.Service
 
                 await CreateCustomerCompanyAsync((CustomerCompany)customer);
             }
-            else if (customerType == "Private")
+            else if (customerType == "private")
             {
                 
                 customer = new CustomerPrivate
@@ -100,12 +101,7 @@ namespace GestioneOrdini.Service
                 .SingleOrDefaultAsync(c => c.Id == customerId);
         }
 
-        // Metodo per ottenere tutti i clienti
-        public async Task<IEnumerable<Customer>> GetAllCustomersAsync()
-        {
-            return await _context.Customers.ToListAsync();
-        }
-
+        
         // Metodo per aggiornare un cliente
         public async Task UpdateCustomerAsync(Customer customer)
         {
@@ -159,5 +155,54 @@ namespace GestioneOrdini.Service
                 await _context.SaveChangesAsync();
             }
         }
+
+        // Metodo per ottenere tutti i clienti come ViewModel
+        public async Task<IEnumerable<CustomerViewModel>> GetAllCustomersAsync()
+        {
+            var customers = await _context.Customers.ToListAsync();
+            return customers.Select(c => ConvertToViewModel(c)).ToList();
+        }
+
+        // Metodo privato per convertire un'entità Customer in CustomerViewModel
+        private CustomerViewModel ConvertToViewModel(Customer customer)
+        {
+            if (customer is CustomerCompany company)
+            {
+                return new CustomerViewModel
+                {
+                    Id = company.Id,
+                    Name = company.Name,
+                    Address = company.Address,
+                    Email = company.Email,
+                    Tel = company.Tel,
+                    PartitaIVA = company.PartitaIVA,
+                    RagioneSociale = company.RagioneSociale
+                };
+            }
+            else if (customer is CustomerPrivate privato)
+            {
+                return new CustomerViewModel
+                {
+                    Id = privato.Id,
+                    Name = privato.Name,
+                    Address = privato.Address,
+                    Email = privato.Email,
+                    Tel = privato.Tel,
+                    CF = privato.CF
+                };
+            }
+            else
+            {
+                return new CustomerViewModel
+                {
+                    Id = customer.Id,
+                    Name = customer.Name,
+                    Address = customer.Address,
+                    Email = customer.Email,
+                    Tel = customer.Tel
+                };
+            }
+        }
+
     }
 }

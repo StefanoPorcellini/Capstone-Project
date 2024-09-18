@@ -21,16 +21,16 @@
       <tr>
         <th>Username</th>
         <th>Ruolo</th>
-        <th>Azioni</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let user of users">
         <td>{{ user.username }}</td>
         <td>{{ user.roleName}}</td>
-        <td>
-          <button (click)="editUser(user)">Modifica</button>
-          <button (click)="deleteUser(user.id)">Elimina</button>
+        <td class="d-flex justify-content-center gap-2">
+          <button class="btn btn-warning" (click)="editUser(user)"><i class="bi bi-pencil-square"></i></button>
+          <button class="btn btn-danger" (click)="deleteUser(user.id)"><i class="bi bi-trash"></i></button>
         </td>
       </tr>
     </tbody>

@@ -9,4 +9,11 @@ export const environment = {
     delete: (userId: number) => `User/delete/${userId}`,
     roles: 'User/roles',
   },
+  customerapi: {
+    create:'Customer/create',
+    getAll:'Customer/getAll',
+    getById: (id: number) => `Customer/getById/${id}`,
+    update: (id: number) => `Customer/update/${id}`,
+    delate: (id: number) => `Customer/delate/${id}`
+  }
 };
