@@ -1,20 +1,20 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { iCustomer } from '../../models/customer';
 import { environment } from '../../../environments/environment.development';
-
+import { SignalRService } from '../../services/signal-r.service'; // Assicurati di avere il percorso corretto
 
 @Component({
   selector: 'app-client-modal',
   templateUrl: './client-modal.component.html',
-  styleUrl: './client-modal.component.scss'
+  styleUrls: ['./client-modal.component.scss']
 })
-export class ClientModal {
+export class ClientModal implements OnInit {
 
-  url: string = 'Customer'
+  url: string = 'Customer';
 
-  customers: iCustomer[] = [];   // Utilizzo dell'interfaccia Customer
+  customers: iCustomer[] = [];
   newCustomer: iCustomer = {
     customerType: 'private',
     name: '',
@@ -28,15 +28,20 @@ export class ClientModal {
 
   showCreateCustomerForm: boolean = false;
 
-  constructor(public activeModal: NgbActiveModal, private http: HttpClient) {}
+  constructor(
+    public activeModal: NgbActiveModal,
+    private http: HttpClient,
+    private signalRService: SignalRService // Inietta il servizio SignalR
+  ) {}
 
   ngOnInit() {
     this.loadCustomers();
+    this.startSignalRConnection();
   }
 
   loadCustomers() {
     this.http.get(`${environment.baseUrl}/${environment.standardApi.getAll(this.url)}`).subscribe((response: any) => {
-      console.log('clienti:',response); // Verifica i dati ricevuti
+      console.log('clienti:', response); // Verifica i dati ricevuti
       this.customers = response;
     });
   }
@@ -56,8 +61,8 @@ export class ClientModal {
     });
   }
 
-  updateCustomer(customer: any) {
-    this.http.put(`${environment.baseUrl}/${environment.standardApi.update(this.url, customer.id)}`, customer).subscribe(() => {
+  updateCustomer(customer: iCustomer) {
+    this.http.put(`${environment.baseUrl}/${environment.standardApi.update(this.url, customer.id!)}`, customer).subscribe(() => {
       this.loadCustomers();
     });
   }
@@ -85,4 +90,11 @@ export class ClientModal {
     this.showCreateCustomerForm = !this.showCreateCustomerForm;
   }
 
+  private startSignalRConnection(): void {
+    this.signalRService.startConnection(); // Avvia la connessione SignalR
+    this.signalRService.addCustomerUpdateListener((message: string) => {
+      console.log('Update received from SignalR: ', message);
+      this.loadCustomers(); // Ricarica i clienti quando ricevi un aggiornamento
+    });
+  }
 }

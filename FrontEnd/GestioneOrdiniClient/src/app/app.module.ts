@@ -14,15 +14,14 @@ import { NavbarComponent } from './navbar/navbar/navbar.component';
 import {
   CalendarModule,
   DateAdapter,
-  CalendarNativeDateFormatter,
   CalendarDateFormatter,
-  DateFormatterParams
- } from 'angular-calendar';
+} from 'angular-calendar';
 import { CalendarComponent } from './pages/calendar/calendar.component';
 import { Time24Pipe } from './pipe/time24.pipe';
 import { FormsModule } from '@angular/forms';
 import { ClientModal } from './modals/client-modal/client-modal.component';
 import { PriceList } from './modals/price-list/price-list.component';
+import { CustomDateFormatter } from './tools/CustomDateFormatter';
 
 registerLocaleData(localeIt);
 
@@ -51,21 +50,15 @@ registerLocaleData(localeIt);
       {
         dateFormatter: {
           provide: CalendarDateFormatter,
-          useClass: AppModule,
+          useClass: CustomDateFormatter, // Usa la nuova classe CustomDateFormatter
         },
       }
-    ),  ],
+    ),
+  ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: LOCALE_ID, useValue: 'it-IT' }
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule extends CalendarNativeDateFormatter {
-  public override weekViewHour({ date, locale }: DateFormatterParams): string {
-    return new Intl.DateTimeFormat('it-IT', {
-      hour: 'numeric',
-      minute: 'numeric',
-    }).format(date);
-  }
-}
+export class AppModule {}

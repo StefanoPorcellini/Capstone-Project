@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
+using GestioneOrdini.Hubs;
 
 namespace GestioneOrdini
 {
@@ -22,6 +23,9 @@ namespace GestioneOrdini
 
             // Aggiungi i servizi al container.
             builder.Services.AddControllers();
+
+            // Aggiungi SignalR
+            builder.Services.AddSignalR();
 
             // Aggiungi DbContext con il SQL Server provider
             builder.Services.AddDbContext<OrdersDbContext>(options =>
@@ -127,6 +131,8 @@ namespace GestioneOrdini
                 app.UseHsts();
             }
 
+            app.UseRouting();
+
             // Abilita CORS
             app.UseCors("AllowFrontend");
 
@@ -137,6 +143,14 @@ namespace GestioneOrdini
             app.UseAuthorization();
 
             app.MapControllers();
+
+            // Configura SignalR e l'Hub per la gestione degli ordini
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHub<OrderHub>("/Hubs/orderHub"); // Aggiungi l'hub di SignalR
+            });
+
 
             app.Run();
         }

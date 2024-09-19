@@ -14,7 +14,7 @@ export const environment = {
     getAll: (url:string) => `${url}/getAll`,
     getById: (url:string, id: number) => `${url}/getById/${id}`,
     update: (url:string, id: number) => `${url}/update/${id}`,
-    delete: (url:string, id: number) => `${url}/delate/${id}`
+    delete: (url:string, id: number) => `${url}/delete/${id}`
   },
 
 };

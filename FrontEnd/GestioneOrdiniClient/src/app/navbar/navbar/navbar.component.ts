@@ -23,7 +23,7 @@ export class NavbarComponent {
     if (accessDataString) {
       const accessData = JSON.parse(accessDataString);
       this.userAuth = accessData.userAuth;
-      console.log(this.userAuth);
+      console.log('Utente loggato: ', this.userAuth);
     }
 
   }

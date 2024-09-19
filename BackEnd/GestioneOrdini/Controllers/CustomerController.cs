@@ -1,7 +1,10 @@
-﻿using GestioneOrdini.Interface;
+﻿using GestioneOrdini.Hubs;
+using GestioneOrdini.Interface;
 using GestioneOrdini.Model.Clients;
+using GestioneOrdini.Model.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,14 +12,16 @@ namespace GestioneOrdini.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin, FrontEnd")]
+    [Authorize(Roles = "Admin,FrontOffice")]
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
+        private readonly IHubContext<OrderHub> _hubContext;
 
-        public CustomerController(ICustomerService customerService)
+        public CustomerController(ICustomerService customerService, IHubContext<OrderHub> hubContext)
         {
             _customerService = customerService;
+            _hubContext = hubContext;
         }
 
         // Create customer based on type
@@ -37,6 +42,9 @@ namespace GestioneOrdini.Controllers
                         request.PartitaIVA,
                         request.RagioneSociale
                     );
+
+                    // Invia un messaggio a tutti i client connessi tramite SignalR
+                    await _hubContext.Clients.All.SendAsync("ReceiveCustomerUpdate", "Un nuovo cliente è stato creato!");
 
                     return CreatedAtAction(nameof(GetCustomerById), new { id = createdCustomer.Id }, createdCustomer);
                 }
@@ -82,6 +90,10 @@ namespace GestioneOrdini.Controllers
                 try
                 {
                     await _customerService.UpdateCustomerAsync(customer);
+
+                    // Invia un messaggio a tutti i client connessi tramite SignalR
+                    await _hubContext.Clients.All.SendAsync("ReceiveCustomerUpdate", $"Il cliente con ID {id} è stato aggiornato.");
+
                     return NoContent();
                 }
                 catch (ArgumentException ex)
@@ -97,19 +109,13 @@ namespace GestioneOrdini.Controllers
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             await _customerService.DeleteCustomerAsync(id);
+
+            // Invia un messaggio a tutti i client connessi tramite SignalR
+            await _hubContext.Clients.All.SendAsync("ReceiveCustomerUpdate", $"Il cliente con ID {id} è stato eliminato.");
+
             return NoContent();
         }
     }
 
-    public class CreateCustomerRequest
-    {
-        public string CustomerType { get; set; } // "Private" or "Company"
-        public string Name { get; set; }
-        public string? Address { get; set; }
-        public string? Email { get; set; }
-        public string Tel { get; set; }
-        public string? CF { get; set; } // Required if Private
-        public string? PartitaIVA { get; set; } // Required if Company
-        public string? RagioneSociale { get; set; } // Required if Company
-    }
+
 }

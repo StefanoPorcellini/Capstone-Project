@@ -1,7 +1,9 @@
-﻿using GestioneOrdini.Interface;
+﻿using GestioneOrdini.Hubs;
+using GestioneOrdini.Interface;
 using GestioneOrdini.Model.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -10,15 +12,18 @@ using Microsoft.AspNetCore.Mvc;
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
+    private readonly IHubContext<OrderHub> _hubContext;
 
-    public OrderController(IOrderService orderService)
+
+    public OrderController(IOrderService orderService, IHubContext<OrderHub> hubContext)
     {
         _orderService = orderService;
+        _hubContext = hubContext;
     }
 
     // Create an Order
     [HttpPost("create")]
-    [Authorize(Roles = "Admin, BackEnd")]
+    [Authorize(Roles = "Admin, BackOffice, FrontOffice")]
 
     public async Task<IActionResult> CreateOrder([FromForm] OrderWithFileDto orderWithFile)
     {
@@ -61,7 +66,7 @@ public class OrderController : ControllerBase
 
     // Update an Order
     [HttpPut("update/{id}")]
-    [Authorize(Roles = "Admin, BackEnd")]
+    [Authorize(Roles = "Admin, BackOffice, FrontOffice")]
     public async Task<IActionResult> UpdateOrder(int id, [FromForm] OrderWithFileDto orderWithFile)
     {
         if (id != orderWithFile.Order.Id)
@@ -80,7 +85,7 @@ public class OrderController : ControllerBase
 
     // Delete an Order
     [HttpDelete("delete/{id}")] // Corretto il typo "delate" in "delete"
-    [Authorize(Roles = "Admin, BackEnd")]
+    [Authorize(Roles = "Admin, BackOffice, FrontOffice")]
 
     public async Task<IActionResult> DeleteOrder(int id)
     {
@@ -90,7 +95,7 @@ public class OrderController : ControllerBase
 
     // Assign Order to Operator
     [HttpPost("{id}/assign")]
-    [Authorize(Roles = "Admin, BackEnd")]
+    [Authorize(Roles = "Admin, BackOffice")]
 
     public async Task<IActionResult> AssignOrderToOperator(int id)
     {
@@ -107,7 +112,7 @@ public class OrderController : ControllerBase
 
     // Update Order Status
     [HttpPut("{id}/status")]
-    [Authorize(Roles = "Admin, BackEnd, FrontEnd")]
+    [Authorize(Roles = "Admin, BackOffice, FrontOffice")]
     public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] int newStatusId)
     {
         try
