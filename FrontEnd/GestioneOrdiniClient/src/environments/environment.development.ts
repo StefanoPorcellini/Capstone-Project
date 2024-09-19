@@ -16,5 +16,8 @@ export const environment = {
     update: (url:string, id: number) => `${url}/update/${id}`,
     delete: (url:string, id: number) => `${url}/delete/${id}`
   },
-
+  orderApi: {
+    assign: (url:string, id: number) => `${url}/${id}/assign`,
+    status: (url:string, id: number) => `${url}/${id}/status`,
+  }
 };

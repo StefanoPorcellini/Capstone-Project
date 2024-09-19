@@ -1,11 +1,13 @@
-import { Component, LOCALE_ID, Inject, ViewChild, TemplateRef } from '@angular/core';
+import { Component, LOCALE_ID, Inject, ViewChild, TemplateRef, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarView, DAYS_OF_WEEK } from 'angular-calendar';
 import { subDays, startOfDay, addDays, isSameMonth, isSameDay, endOfDay, format } from 'date-fns';
-import { it } from 'date-fns/locale';  // Importa la localizzazione italiana per date-fns
+import { it } from 'date-fns/locale';
+import { HttpClient } from '@angular/common/http'; // Importa HttpClient
+import { environment } from '../../../environments/environment.development'; // Importa l'environment
 
 // Formatta una data come test per assicurarti che funzioni in italiano
-format(new Date(),'P', {locale: it});
+format(new Date(), 'P', { locale: it });
 
 const colors: any = {
   red: {
@@ -27,7 +29,9 @@ const colors: any = {
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
 })
-export class CalendarComponent {
+export class CalendarComponent implements OnInit {
+
+  url: string = environment.standardApi.getAll(environment.baseUrl + '/Order'); // URL API per gli ordini
 
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any> | undefined;
 
@@ -43,18 +47,30 @@ export class CalendarComponent {
     event: CalendarEvent;
   } | undefined;
 
-  events: CalendarEvent[] = [
-    {
-      start: subDays(startOfDay(new Date()), 1),
-      end: addDays(new Date(), 1),
-      title: 'Evento esempio',
-      color: colors.blue,
-    }
-  ];
+  events: CalendarEvent[] = [];
 
   activeDayIsOpen: boolean = true;
 
-  constructor(@Inject(LOCALE_ID) public locale: string, private modal: NgbModal) {}
+  constructor(
+    @Inject(LOCALE_ID) public locale: string,
+    private modal: NgbModal,
+    private http: HttpClient  // Inietta HttpClient
+  ) {}
+
+  ngOnInit(): void {
+    this.fetchEvents();
+  }
+
+  fetchEvents(): void {
+    this.http.get<any[]>(this.url).subscribe((data) => {
+      this.events = data.map(event => ({
+        start: new Date(event.startDate), // Assicurati che il formato della data sia corretto
+        end: new Date(event.endDate),
+        title: event.title,
+        color: colors.blue,
+      }));
+    });
+  }
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (isSameMonth(date, this.viewDate)) {
@@ -110,15 +126,15 @@ export class CalendarComponent {
     ];
   }
 
-  deleteEvent(eventToDelete: CalendarEvent) {
+  deleteEvent(eventToDelete: CalendarEvent): void {
     this.events = this.events.filter((event) => event !== eventToDelete);
   }
 
-  setView(view: CalendarView) {
+  setView(view: CalendarView): void {
     this.view = view;
   }
 
-  closeOpenMonthViewDay() {
+  closeOpenMonthViewDay(): void {
     this.activeDayIsOpen = false;
   }
 }
