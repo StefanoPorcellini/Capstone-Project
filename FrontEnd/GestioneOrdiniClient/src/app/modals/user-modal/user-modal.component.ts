@@ -18,8 +18,15 @@ export class UserModal implements OnInit {
   newRoleName: string = ''; // Variabile per il nome del ruolo
   roles: Role[] = []; // Array per i ruoli
   newRoleId: number | null = null; // Variabile per il nuovo ruolo (ID)
+  showForm: boolean = false
 
   constructor(public activeModal: NgbActiveModal, private http: HttpClient) {}
+
+  toggleForm() {
+    this.showForm = !this.showForm;
+    this.resetForm();
+  }
+
 
   ngOnInit() {
     this.loadUsers(); // Carica gli utenti all'apertura del modale
@@ -74,6 +81,7 @@ export class UserModal implements OnInit {
     this.selectedUser = user; // Imposta l'utente selezionato per la modifica
     this.newUsername = user.username; // Precompila il campo username
     this.newRoleId = user.roleId; // Precompila il campo ruolo (modifica in base al tuo modello)
+    this.showForm = true;
   }
 
   updateUser() {

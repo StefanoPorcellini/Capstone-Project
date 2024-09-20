@@ -1,4 +1,6 @@
-﻿namespace GestioneOrdini.Model.PriceList
+﻿using GestioneOrdini.Model.Order;
+
+namespace GestioneOrdini.Model.PriceList
 {
     public class LaserPriceList
     {
@@ -7,7 +9,8 @@
         public int? MaxQuantity { get; set; } // Nullable per gestire il range aperto
         public decimal UnitPrice { get; set; } // Prezzo unitario per questo range
 
-        // Optional: A description to identify the range, if needed.
         public string Description { get; set; }
+        public virtual ICollection<LaserItem> LaserItems { get; set; }
+
     }
 }

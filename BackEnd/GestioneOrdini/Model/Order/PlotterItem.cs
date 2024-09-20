@@ -9,7 +9,5 @@ public class PlotterItem : Item
     public double? Height { get; set; } // Nullable for standard plotters
     public double? PricePerSquareMeter { get; set; } // Nullable for standard
     public int? Quantity { get; set; } // Nullable for standard
-
-
     public virtual PlotterStandard PlotterStandard { get; set; }
 }

@@ -2,8 +2,11 @@
   <h4 class="modal-title">Gestione Utenti</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
 </div>
+
 <div class="modal-body">
-  <div>
+  <button *ngIf="!showForm" class="btn btn-primary mb-3" (click)="toggleForm()">Crea Nuovo Utente</button>
+
+  <div *ngIf="showForm" class="d-flex flex-column gap-2">
     <h5 *ngIf="selectedUser">Modifica Utente</h5>
     <h5 *ngIf="!selectedUser">Crea Nuovo Utente</h5>
     <input type="text" [(ngModel)]="newUsername" placeholder="Username" />
@@ -12,11 +15,15 @@
       <option value="" disabled selected>Seleziona Ruolo</option>
       <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
     </select>
-    <button (click)="selectedUser ? updateUser() : createUser()">
-      {{ selectedUser ? 'Aggiorna' : 'Crea' }}
-    </button>
+    <div class="d-flex gap-2">
+      <button class="btn btn-success flex-fill" (click)="selectedUser ? updateUser() : createUser()">
+        {{ selectedUser ? 'Aggiorna' : 'Crea' }}
+      </button>
+      <button class="btn btn-secondary flex-fill" (click)="toggleForm()">Annulla</button>
+    </div>
   </div>
-  <table class="table">
+
+  <table class="table mt-4">
     <thead>
       <tr>
         <th>Username</th>
@@ -36,6 +43,7 @@
     </tbody>
   </table>
 </div>
+
 <div class="modal-footer">
   <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">Chiudi</button>
 </div>

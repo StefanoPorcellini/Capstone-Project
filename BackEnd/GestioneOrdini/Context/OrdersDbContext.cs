@@ -27,12 +27,12 @@ namespace GestioneOrdini.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configura la gerarchia delle classi Customer
+            // Configura la relazione tra Customer e Order
             modelBuilder.Entity<Customer>()
-                .HasDiscriminator<string>("CustomerType")
-                .HasValue<Customer>("Base")
-                .HasValue<CustomerPrivate>("Private")
-                .HasValue<CustomerCompany>("Company");
+                .HasMany(c => c.Orders)
+                .WithOne(o => o.Customer)
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configura la relazione tra User e Role
             modelBuilder.Entity<User>()
@@ -42,45 +42,44 @@ namespace GestioneOrdini.Context
 
             // Configura la relazione tra Item e WorkType
             modelBuilder.Entity<Item>()
-                .HasOne(i => i.Type) // Usa la proprietà WorkType per la navigazione
-                .WithMany()
+                .HasOne(i => i.Type)
+                .WithMany(w => w.Items)
                 .HasForeignKey(i => i.WorkTypeId)
-                .OnDelete(DeleteBehavior.Restrict); // Configura il comportamento di eliminazione se necessario
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configura la proprietà per FileName e FilePath su Item
             modelBuilder.Entity<Item>()
                 .Property(i => i.FileName)
-                .HasMaxLength(255); // Limite alla lunghezza del nome file
+                .HasMaxLength(255);
 
             modelBuilder.Entity<Item>()
                 .Property(i => i.FilePath)
-                .HasMaxLength(255); // Limite alla lunghezza del percorso
+                .HasMaxLength(255);
 
             // Configurazione per LaserItem
             modelBuilder.Entity<LaserItem>()
                 .HasOne(l => l.LaserStandard)
-                .WithMany()
+                .WithMany(ls => ls.LaserItems)
                 .HasForeignKey(l => l.LaserStandardId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configurazione per PlotterItem
             modelBuilder.Entity<PlotterItem>()
                 .HasOne(p => p.PlotterStandard)
-                .WithMany()
+                .WithMany(ps => ps.PlotterItems)
                 .HasForeignKey(p => p.PlotterStandardId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configurazione della relazione tra Order e Item
             modelBuilder.Entity<Order>()
-                .HasOne(o => o.Item)
-                .WithMany()
-                .HasForeignKey(o => o.ItemId)
+                .HasMany(o => o.Items)
+                .WithOne(i => i.Order)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configura la relazione tra Order e OrderStatus
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Status)
-                .WithMany()
+                .WithMany(s => s.Orders)
                 .HasForeignKey(o => o.StatusId);
 
             // Configurazione delle precisioni per i campi Price
@@ -99,8 +98,12 @@ namespace GestioneOrdini.Context
             // Configura la relazione tra LaserItem e LaserPriceList
             modelBuilder.Entity<LaserItem>()
                 .HasMany(li => li.LaserPriceLists)
-                .WithOne()
-                .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(lpl => lpl.LaserItems);
+
+            // Configura la relazione tra Order e TotalAmount
+            modelBuilder.Entity<Order>()
+                .Property(o => o.TotalAmount)
+                .HasColumnType("decimal(18,2)");
         }
     }
 }

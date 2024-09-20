@@ -22,6 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { ClientModal } from './modals/client-modal/client-modal.component';
 import { PriceList } from './modals/price-list/price-list.component';
 import { CustomDateFormatter } from './tools/CustomDateFormatter';
+import { OrderModalComponent } from './modals/order-modal/order-modal.component';
 
 registerLocaleData(localeIt);
 
@@ -34,7 +35,8 @@ registerLocaleData(localeIt);
     Time24Pipe,
     UserModal,
     ClientModal,
-    PriceList
+    PriceList,
+    OrderModalComponent
   ],
   imports: [
     BrowserModule,

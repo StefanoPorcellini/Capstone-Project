@@ -4,7 +4,9 @@
     {
         public int Id { get; set; }
         public string Description { get; set; }
-        public decimal Price { get; set; } // Price for fixed plotter types
+        public decimal Price { get; set; } 
+        public virtual ICollection<PlotterItem> PlotterItems { get; set; }
+
     }
 
 }

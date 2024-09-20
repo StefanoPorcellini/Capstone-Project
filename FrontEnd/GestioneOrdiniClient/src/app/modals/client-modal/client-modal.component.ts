@@ -26,7 +26,7 @@ export class ClientModal implements OnInit {
     ragioneSociale: ''
   };
 
-  showCreateCustomerForm: boolean = false;
+  showForm: boolean = false;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -37,6 +37,11 @@ export class ClientModal implements OnInit {
   ngOnInit() {
     this.loadCustomers();
     this.startSignalRConnection();
+  }
+
+  toggleForm() {
+    this.showForm = !this.showForm;
+    this.resetForm();
   }
 
   loadCustomers() {
@@ -87,7 +92,7 @@ export class ClientModal implements OnInit {
   }
 
   toggleCreateCustomerForm() {
-    this.showCreateCustomerForm = !this.showCreateCustomerForm;
+    this.showForm = !this.showForm;
   }
 
   private startSignalRConnection(): void {

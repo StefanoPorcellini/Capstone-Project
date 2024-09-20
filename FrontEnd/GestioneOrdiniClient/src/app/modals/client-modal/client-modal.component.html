@@ -4,42 +4,12 @@
 </div>
 
 <div class="modal-body">
-  <!-- Tabella clienti -->
-  <h5>Clienti Esistenti</h5>
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Indirizzo</th>
-        <th>Email</th>
-        <th>Telefono</th>
-        <th>CF/Partita IVA</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let customer of customers"
-          [ngClass]="{'table-info': customer.customerType === 'private', 'table-warning': customer.customerType === 'company'}">
-        <td>{{ customer.name }}</td>
-        <td>{{ customer.address }}</td>
-        <td>{{ customer.email }}</td>
-        <td>{{ customer.tel }}</td>
-        <td>{{ customer.customerType === 'private' ? customer.cf : customer.partitaIVA }}</td>
-        <td class="d-flex justify-content-end gap-2">
-          <button class="btn btn-warning" (click)="updateCustomer(customer)"><i class="bi bi-pencil-square"></i></button>
-          <button class="btn btn-danger" (click)="deleteCustomer(customer.id!)"><i class="bi bi-trash"></i></button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
 
   <!-- Pulsante per mostrare/nascondere il modulo di creazione -->
-  <button class="btn btn-primary mt-3" (click)="toggleCreateCustomerForm()">
-    {{ showCreateCustomerForm ? 'Nascondi' : 'Crea Nuovo Cliente' }}
-  </button>
+  <button *ngIf="!showForm" class="btn btn-primary mb-3" (click)="toggleForm()">Crea Nuovo Cliente</button>
 
   <!-- Form di creazione cliente -->
-  <div *ngIf="showCreateCustomerForm" class="mt-4">
+  <div *ngIf="showForm" class="mt-4">
     <h5>Nuovo Cliente</h5>
     <form (submit)="createCustomer()">
       <div class="mb-3">
@@ -79,10 +49,42 @@
         <label for="ragioneSociale">Ragione Sociale</label>
         <input type="text" id="ragioneSociale" [(ngModel)]="newCustomer.ragioneSociale" name="ragioneSociale" class="form-control">
       </div>
-
-      <button type="submit" class="btn btn-primary">Crea Cliente</button>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success flex-fill">Crea Cliente</button>
+        <button class="btn btn-secondary flex-fill" (click)="toggleForm()">Annulla</button>
+      </div>
     </form>
+    <br>
   </div>
+
+  <!-- Tabella clienti -->
+  <h5>Clienti Esistenti</h5>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Indirizzo</th>
+        <th>Email</th>
+        <th>Telefono</th>
+        <th>CF/Partita IVA</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let customer of customers"
+          [ngClass]="{'table-info': customer.customerType === 'private', 'table-warning': customer.customerType === 'company'}">
+        <td>{{ customer.name }}</td>
+        <td>{{ customer.address }}</td>
+        <td>{{ customer.email }}</td>
+        <td>{{ customer.tel }}</td>
+        <td>{{ customer.customerType === 'private' ? customer.cf : customer.partitaIVA }}</td>
+        <td class="d-flex justify-content-end gap-2">
+          <button class="btn btn-warning" (click)="updateCustomer(customer)"><i class="bi bi-pencil-square"></i></button>
+          <button class="btn btn-danger" (click)="deleteCustomer(customer.id!)"><i class="bi bi-trash"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <div class="modal-footer">
