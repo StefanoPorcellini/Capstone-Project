@@ -1,3 +1,4 @@
+import { OrderModal } from './../../modals/order-modal/order-modal.component';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../auth/Service/auth-service.service';
 import { iUserAuth } from './../../models/user';
@@ -52,14 +53,18 @@ export class NavbarComponent {
   }
 
   openUserModal() {
-    const userModalRef = this.modalService.open(UserModal, { centered: true }); // Aggiunto l'opzione 'centered'
+    const userModalRef = this.modalService.open(UserModal); // Aggiunto l'opzione 'centered'
   }
 
   openClientModal(){
-    const clentModalRef = this.modalService.open(ClientModal,{centered: true, size: 'xl', scrollable: true})
+    const clentModalRef = this.modalService.open(ClientModal,{size: 'xl', scrollable: true})
   }
 
   openPriceListModal(){
-    const clentModalRef = this.modalService.open(PriceList,{centered: true, size: 'xl', scrollable: true})
+    const clentModalRef = this.modalService.open(PriceList,{ size: 'xl', scrollable: true})
+  }
+
+  openNewOrder() {
+    const orderModalRef = this.modalService.open(OrderModal,{size: 'xl', scrollable: true})
   }
 }

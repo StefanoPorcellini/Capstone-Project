@@ -1,52 +1,44 @@
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../environments/environment.development';
-import { iOrder, iOrderStatus } from '../../models/order';
+import { iOrder, iStatus } from '../../models/order';
+import { iCustomer } from '../../models/customer';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-order-modal',
   templateUrl: './order-modal.component.html',
   styleUrls: ['./order-modal.component.scss']
 })
-export class OrderModalComponent {
+export class OrderModal {
   @Input() selectedDate!: Date;
-  order: iOrder = {} as iOrder;
-  statuses: iOrderStatus[] = [];
+  newOrder: iOrder = {} as iOrder;
+  statuses: iStatus[] = [];
   orders: iOrder[] = [];
+  customers: iCustomer[] = [];
+  file: File | null = null;
+
 
   constructor(
-    public activeModal: NgbActiveModal,
+    public activeModal: NgbActiveModal, private orderService: OrderService
   ) {}
 
-  ngOnInit(): void {
-    // this.loadStatuses();
-    // this.loadOrders();
+  onFileSelected(event: any) {
+    this.file = event.target.files[0];
   }
 
-  // loadStatuses() {
-  //   this.orderService.getAllOrderStatuses().subscribe(statuses => {
-  //     this.statuses = statuses;
-  //   });
-  // }
+  createOrder() {
+    this.orderService.createOrder(this.newOrder, this.file).subscribe(
+      (response) => {
+        console.log('Order created successfully:', response);
+        // Aggiungi eventuale logica di successo qui
+      },
+      (error) => {
+        console.error('Error creating order:', error);
+        // Gestisci l'errore
+      }
+    );
+  }
 
-  // loadOrders() {
-  //   this.orderService.getAllOrders().subscribe(orders => {
-  //     this.orders = orders.filter(order =>
-  //       new Date(order.creationDate) <= this.selectedDate &&
-  //       new Date(order.deliveryDate) >= this.selectedDate
-  //     );
-  //   });
-  // }
 
-  // addOrder() {
-  //   const formData = new FormData();
-  //   formData.append('order', JSON.stringify(this.order));
-  //   if (this.order.file) {
-  //     formData.append('file', this.order.file);
-  //   }
-
-  //   this.orderService.createOrder(formData).subscribe(() => {
-  //     this.activeModal.close();
-  //   });
-  // }
 }

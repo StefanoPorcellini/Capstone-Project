@@ -3,6 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../environments/environment.development';
 import { iLaserPriceList, iLaserStandard, iPlotterStandard } from '../../models/price-list';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+
 
 @Component({
   selector: 'app-price-list',

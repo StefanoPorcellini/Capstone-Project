@@ -8,7 +8,7 @@ public class OrderService : IOrderService
 {
     private readonly OrdersDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly string _storagePath = "~/FileUpload";
+    private readonly string _storagePath = "~/FileUpload"; 
 
     public OrderService(OrdersDbContext context, IHttpContextAccessor httpContextAccessor)
     {

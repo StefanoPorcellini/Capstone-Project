@@ -1,10 +1,11 @@
+import { OrderService } from './../../services/order.service';
 import { Component, LOCALE_ID, Inject, ViewChild, TemplateRef, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarView, DAYS_OF_WEEK } from 'angular-calendar';
 import { subDays, startOfDay, addDays, isSameMonth, isSameDay, endOfDay, format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { HttpClient } from '@angular/common/http'; // Importa HttpClient
-import { environment } from '../../../environments/environment.development'; // Importa l'environment
+import { iOrder } from '../../models/order';
 
 // Formatta una data come test per assicurarti che funzioni in italiano
 format(new Date(), 'P', { locale: it });
@@ -31,7 +32,7 @@ const colors: any = {
 })
 export class CalendarComponent implements OnInit {
 
-  url: string = environment.standardApi.getAll(environment.baseUrl + '/Order'); // URL API per gli ordini
+
 
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any> | undefined;
 
@@ -54,7 +55,7 @@ export class CalendarComponent implements OnInit {
   constructor(
     @Inject(LOCALE_ID) public locale: string,
     private modal: NgbModal,
-    private http: HttpClient  // Inietta HttpClient
+    private orderService: OrderService
   ) {}
 
   ngOnInit(): void {
@@ -62,11 +63,11 @@ export class CalendarComponent implements OnInit {
   }
 
   fetchEvents(): void {
-    this.http.get<any[]>(this.url).subscribe((data) => {
-      this.events = data.map(event => ({
-        start: new Date(event.startDate), // Assicurati che il formato della data sia corretto
-        end: new Date(event.endDate),
-        title: event.title,
+    this.orderService.getOrders().subscribe((orders: iOrder[]) => {
+      this.events = orders.map(order => ({
+        start: new Date(order.date || ''),
+        end: new Date(order.maxDeliveryDate || ''),
+        title: order.description || 'Ordine senza descrizione',
         color: colors.blue,
       }));
     });

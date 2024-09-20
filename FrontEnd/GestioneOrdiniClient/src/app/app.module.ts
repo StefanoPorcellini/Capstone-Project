@@ -22,7 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { ClientModal } from './modals/client-modal/client-modal.component';
 import { PriceList } from './modals/price-list/price-list.component';
 import { CustomDateFormatter } from './tools/CustomDateFormatter';
-import { OrderModalComponent } from './modals/order-modal/order-modal.component';
+import { OrderModal } from './modals/order-modal/order-modal.component';
 
 registerLocaleData(localeIt);
 
@@ -36,7 +36,7 @@ registerLocaleData(localeIt);
     UserModal,
     ClientModal,
     PriceList,
-    OrderModalComponent
+    OrderModal,
   ],
   imports: [
     BrowserModule,
