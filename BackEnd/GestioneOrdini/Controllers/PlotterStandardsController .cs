@@ -9,7 +9,7 @@ namespace GestioneOrdini.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="Admin, Owner")]
+    [Authorize(Roles = "Admin, Titolare")]
     public class PlotterStandardsController : ControllerBase
     {
         private readonly IGenericService<PlotterStandard> _plotterStandardService;

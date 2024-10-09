@@ -10,7 +10,6 @@ namespace GestioneOrdini.Model.PriceList
         public decimal UnitPrice { get; set; } // Prezzo unitario per questo range
 
         public string Description { get; set; }
-        public virtual ICollection<LaserItem> LaserItems { get; set; }
 
     }
 }

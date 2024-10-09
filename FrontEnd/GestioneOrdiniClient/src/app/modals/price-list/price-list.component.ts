@@ -3,10 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../environments/environment.development';
 import { iLaserPriceList, iLaserStandard, iPlotterStandard } from '../../models/price-list';
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
-
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-price-list',
@@ -29,28 +26,24 @@ export class PriceList implements OnInit {
     this.loadLaserPriceList();
   }
 
-  // Carica i dati del listino prezzi laser
   loadLaserPriceList() {
     this.http.get<iLaserPriceList[]>(this.laserPriceListUrl).subscribe(data => {
       this.laserPriceList = data;
     });
   }
 
-  // Carica i dati del listino prezzi laser standard
   loadLaserStandard() {
     this.http.get<iLaserStandard[]>(this.laserStandardUrl).subscribe(data => {
       this.laserStandard = data;
     });
   }
 
-  // Carica i dati del listino prezzi plotter
   loadPlotterStandard() {
     this.http.get<iPlotterStandard[]>(this.plotterStandardUrl).subscribe(data => {
       this.plotterStandard = data;
     });
   }
 
-  // Gestione del cambio di lista (listino prezzi selezionato)
   onListChange(listType: string) {
     this.selectedList = listType;
     switch (listType) {
@@ -66,35 +59,53 @@ export class PriceList implements OnInit {
     }
   }
 
-  // Metodo per modificare un elemento
   editItem(listType: string, id: number, updatedItem: any) {
-    const url = this.getUpdateUrl(listType, id);
-    this.http.put(url, updatedItem).subscribe({
-      next: (res) => {
-        console.log('Update successful', res);
-        this.refreshList(listType);
-      },
-      error: (err) => {
-        console.error('Update failed', err);
+    Swal.fire({
+      title: 'Confermi la modifica?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sì, modifica',
+      cancelButtonText: 'No, annulla'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const url = this.getUpdateUrl(listType, id);
+        this.http.put(url, updatedItem).subscribe({
+          next: (res) => {
+            Swal.fire('Modifica riuscita', '', 'success');
+            this.refreshList(listType);
+          },
+          error: (err) => {
+            Swal.fire('Errore', 'La modifica non è riuscita', 'error');
+          }
+        });
       }
     });
   }
 
-  // Metodo per cancellare un elemento
   deleteItem(listType: string, id: number) {
-    const url = this.getDeleteUrl(listType, id);
-    this.http.delete(url).subscribe({
-      next: (res) => {
-        console.log('Delete successful', res);
-        this.refreshList(listType);
-      },
-      error: (err) => {
-        console.error('Delete failed', err);
+    Swal.fire({
+      title: 'Sei sicuro?',
+      text: "Questa operazione non può essere annullata!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sì, elimina',
+      cancelButtonText: 'No, annulla'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const url = this.getDeleteUrl(listType, id);
+        this.http.delete(url).subscribe({
+          next: (res) => {
+            Swal.fire('Eliminato!', 'L\'elemento è stato eliminato.', 'success');
+            this.refreshList(listType);
+          },
+          error: (err) => {
+            Swal.fire('Errore', 'L\'elemento non è stato eliminato', 'error');
+          }
+        });
       }
     });
   }
 
-  // Metodo per ottenere l'URL per l'update
   getUpdateUrl(listType: string, id: number): string {
     switch (listType) {
       case 'laserPriceList':
@@ -108,7 +119,6 @@ export class PriceList implements OnInit {
     }
   }
 
-  // Metodo per ottenere l'URL per la cancellazione
   getDeleteUrl(listType: string, id: number): string {
     switch (listType) {
       case 'laserPriceList':
@@ -122,7 +132,6 @@ export class PriceList implements OnInit {
     }
   }
 
-  // Metodo per ricaricare la lista dopo un'operazione di update/delete
   refreshList(listType: string) {
     switch (listType) {
       case 'laserPriceList':

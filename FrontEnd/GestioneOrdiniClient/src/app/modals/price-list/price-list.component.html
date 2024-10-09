@@ -32,20 +32,22 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Description</th>
-          <th class="text-end">Unit Price</th>
-          <th>Quantity Range</th>
+          <th>Descrizione</th>
+          <th class="text-end">Prezzo Unitario</th>
+          <th class="text-end">Quantità</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of laserPriceList">
           <td>{{ item.description }}</td>
-          <td><strong>{{ item.unitPrice | currency:'EUR' }}</strong></td>
-          <td class="text-end">{{ item.minQuantity }} - {{ item.maxQuantity }}</td>
-          <td class="d-flex justify-content-end gap-2">
+          <td class="text-end"><strong>{{ item.unitPrice | currency:'EUR' }}</strong></td>
+          <td class="text-end">
+            {{ item.maxQuantity ? ('da ' + item.minQuantity + ' a ' + item.maxQuantity + ' copie') : ('oltre ' + item.minQuantity + 'copie') }}
+          </td>
+                    <td class="d-flex justify-content-end gap-2">
             <button class="btn btn-warning btn-sm" (click)="editItem('laserPriceList', item.id, item)"><i class="bi bi-pencil-square"></i></button>
-            <button class="btn btn-danger btn-sm" (click)="deleteItem('laserPriceList', item.id)"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-danger btn-sm" (click)="deleteItem('laserPriceList', item.id)"><i class="bi bi-trash"></i></button>
           </td>
         </tr>
       </tbody>
@@ -57,8 +59,8 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Description</th>
-          <th class="text-end">Price</th>
+          <th>Descrizione</th>
+          <th class="text-end">Prezzo</th>
           <th></th>
         </tr>
       </thead>
@@ -68,7 +70,7 @@
           <td class="text-end"><strong>{{ item.price  | currency:'EUR' }}</strong></td>
           <td class="d-flex justify-content-end gap-2">
             <button class="btn btn-warning btn-sm" (click)="editItem('laserStandard', item.id, item)"><i class="bi bi-pencil-square"></i></button>
-            <button class="btn btn-danger btn-sm" (click)="deleteItem('laserStandard', item.id)"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-danger btn-sm" (click)="deleteItem('laserStandard', item.id)"><i class="bi bi-trash"></i></button>
           </td>
         </tr>
       </tbody>
@@ -80,8 +82,8 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Description</th>
-          <th class="text-end">Price</th>
+          <th>Descrizione</th>
+          <th class="text-end">Prezzo</th>
           <th></th>
         </tr>
       </thead>
@@ -91,7 +93,7 @@
           <td class="text-end"><strong>{{ item.price  | currency:'EUR' }}</strong></td>
           <td class="d-flex justify-content-end gap-2">
             <button class="btn btn-warning btn-sm" (click)="editItem('plotterStandard', item.id, item)"><i class="bi bi-pencil-square"></i></button>
-            <button class="btn btn-danger btn-sm" (click)="deleteItem('plotterStandard', item.id)"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-danger btn-sm" (click)="deleteItem('plotterStandard', item.id)"><i class="bi bi-trash"></i></button>
           </td>
         </tr>
       </tbody>
@@ -101,5 +103,5 @@
 
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Close</button>
+  <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Chiudi</button>
 </div>

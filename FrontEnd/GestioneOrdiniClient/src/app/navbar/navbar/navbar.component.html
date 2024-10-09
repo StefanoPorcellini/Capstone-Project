@@ -1,32 +1,30 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#"><img src="../../../assets/img/logo_light_small.svg" alt="logo" srcset=""></a>
+    <a class="navbar-brand" ><img src="../../../assets/img/logo_light_small.svg" alt="logo" srcset=""></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" (click)="openUserModal()">Gestione Utenti</a>
+        <li class="nav-item" *ngIf="userRole === 'Admin'">
+          <a  class="nav-link" aria-current="page" (click)="openUserModal()">Gestione Utenti</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link " aria-current="page" (click)="openClientModal()">Gestione Clienti</a>
+        <li class="nav-item" *ngIf="userRole === 'Admin' || userRole === 'FrontOffice'" >
+          <a class="nav-link " aria-current="page" (click)="openClientModal()">
+            Gestione Clienti</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="userRole === 'Admin' || userRole === 'Titolare'">
           <a class="nav-link " aria-current="page" (click)="openPriceListModal()">Listini prezzi</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item"  *ngIf="userRole">
           <a class="btn btn-success" aria-current="page" (click)="openNewOrder()">Nuovo Lavoro</a>
         </li>
 
 
       </ul>
       <div class="d-flex align-items-center justify-content-between gap-2">
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
-        </form>
+
         <div>
           <i class="bi bi-person-circle"> {{ userAuth?.username }}</i>
         </div>

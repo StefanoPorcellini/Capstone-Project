@@ -3,7 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { iCustomer } from '../../models/customer';
 import { environment } from '../../../environments/environment.development';
-import { SignalRService } from '../../services/signal-r.service'; // Assicurati di avere il percorso corretto
+import { SignalRService } from '../../services/signal-r.service';
+import Swal from 'sweetalert2'; // Importa SweetAlert
 
 @Component({
   selector: 'app-client-modal',
@@ -31,7 +32,7 @@ export class ClientModal implements OnInit {
   constructor(
     public activeModal: NgbActiveModal,
     private http: HttpClient,
-    private signalRService: SignalRService // Inietta il servizio SignalR
+    private signalRService: SignalRService
   ) {}
 
   ngOnInit() {
@@ -46,7 +47,7 @@ export class ClientModal implements OnInit {
 
   loadCustomers() {
     this.http.get(`${environment.baseUrl}/${environment.standardApi.getAll(this.url)}`).subscribe((response: any) => {
-      console.log('clienti:', response); // Verifica i dati ricevuti
+      console.log('clienti:', response);
       this.customers = response;
     });
   }
@@ -67,14 +68,41 @@ export class ClientModal implements OnInit {
   }
 
   updateCustomer(customer: iCustomer) {
-    this.http.put(`${environment.baseUrl}/${environment.standardApi.update(this.url, customer.id!)}`, customer).subscribe(() => {
-      this.loadCustomers();
+    Swal.fire({
+      title: 'Confermi la modifica?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sì, modifica',
+      cancelButtonText: 'No, annulla'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.http.put(`${environment.baseUrl}/${environment.standardApi.update(this.url, customer.id!)}`, customer).subscribe(() => {
+          Swal.fire('Modifica riuscita', '', 'success');
+          this.loadCustomers();
+        }, (error) => {
+          Swal.fire('Errore', 'La modifica non è riuscita', 'error');
+        });
+      }
     });
   }
 
   deleteCustomer(id: number) {
-    this.http.delete(`${environment.baseUrl}/${environment.standardApi.delete(this.url, id)}`).subscribe(() => {
-      this.loadCustomers();
+    Swal.fire({
+      title: 'Sei sicuro?',
+      text: "Questa operazione non può essere annullata!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sì, elimina',
+      cancelButtonText: 'No, annulla'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.http.delete(`${environment.baseUrl}/${environment.standardApi.delete(this.url, id)}`).subscribe(() => {
+          Swal.fire('Eliminato!', 'Il cliente è stato eliminato.', 'success');
+          this.loadCustomers();
+        }, (error) => {
+          Swal.fire('Errore', 'Il cliente non è stato eliminato', 'error');
+        });
+      }
     });
   }
 
@@ -96,10 +124,10 @@ export class ClientModal implements OnInit {
   }
 
   private startSignalRConnection(): void {
-    this.signalRService.startConnection(); // Avvia la connessione SignalR
+    this.signalRService.startConnection();
     this.signalRService.addCustomerUpdateListener((message: string) => {
       console.log('Update received from SignalR: ', message);
-      this.loadCustomers(); // Ricarica i clienti quando ricevi un aggiornamento
+      this.loadCustomers();
     });
   }
 }

@@ -1,3 +1,5 @@
+using AutoMapper;
+using GestioneOrdini.Model.Order;
 using GestioneOrdini.Context;
 using GestioneOrdini.Interface;
 using GestioneOrdini.Service;
@@ -5,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using GestioneOrdini.Hubs;
+using System;
 
 namespace GestioneOrdini
 {
@@ -21,13 +23,16 @@ namespace GestioneOrdini
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); // Aggiungi questa riga
+
+
             // Aggiungi i servizi al container.
             builder.Services.AddControllers();
 
-            // Aggiungi SignalR
+            // Aggiungi SignalR per la comunicazione in tempo reale
             builder.Services.AddSignalR();
 
-            // Aggiungi DbContext con il SQL Server provider
+            // Configura il DbContext con SQL Server
             builder.Services.AddDbContext<OrdersDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DbGO")));
 
@@ -43,15 +48,15 @@ namespace GestioneOrdini
             // Aggiungi l'accesso al contesto HTTP per l'uso nei servizi
             builder.Services.AddHttpContextAccessor();
 
-            // Configurazione di CORS
+            // Configurazione di CORS per abilitare il frontend
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200") // Origine frontend
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
+                    policy.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                 });
             });
 
@@ -64,7 +69,7 @@ namespace GestioneOrdini
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero,
+                        ClockSkew = TimeSpan.Zero,  // Riduce la tolleranza per la validità del token
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
@@ -75,7 +80,17 @@ namespace GestioneOrdini
             // Aggiungi autorizzazione
             builder.Services.AddAuthorization();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            // Registrazione di AutoMapper
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+            // Configurazione per la registrazione dei log
+            builder.Services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddConsole(); // Logs to the console
+                loggingBuilder.AddDebug();   // Logs to the debug window
+            });
+
+            // Configurazione Swagger/OpenAPI per la documentazione API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -92,19 +107,19 @@ namespace GestioneOrdini
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
 
             var app = builder.Build();
@@ -116,17 +131,16 @@ namespace GestioneOrdini
                 RequestPath = "/uploads"
             });
 
-
             // Configura la pipeline delle richieste HTTP.
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GestioneOrdini API v1"));
             }
             else
             {
-                // Configurazione della gestione degli errori globali per la produzione
+                // Gestione globale degli errori in produzione
                 app.UseExceptionHandler("/error");
                 app.UseHsts();
             }
@@ -136,21 +150,16 @@ namespace GestioneOrdini
             // Abilita CORS
             app.UseCors("AllowFrontend");
 
+            // Redirect su HTTPS e gestione autenticazione/ autorizzazione
             app.UseHttpsRedirection();
-
-            // Configura la sicurezza, ad esempio, autenticazione e autorizzazione
-            app.UseAuthentication(); // Se usi autenticazione
+            app.UseAuthentication();
             app.UseAuthorization();
 
+            // Configura gli endpoint
             app.MapControllers();
 
-            // Configura SignalR e l'Hub per la gestione degli ordini
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapHub<OrderHub>("/Hubs/orderHub"); // Aggiungi l'hub di SignalR
-            });
-
+            // Aggiungi il supporto per SignalR e gli hub
+            app.MapHub<OrderHub>("/Hubs/orderHub");
 
             app.Run();
         }

@@ -18,7 +18,7 @@ import {
 } from 'angular-calendar';
 import { CalendarComponent } from './pages/calendar/calendar.component';
 import { Time24Pipe } from './pipe/time24.pipe';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ClientModal } from './modals/client-modal/client-modal.component';
 import { PriceList } from './modals/price-list/price-list.component';
 import { CustomDateFormatter } from './tools/CustomDateFormatter';
@@ -36,7 +36,7 @@ registerLocaleData(localeIt);
     UserModal,
     ClientModal,
     PriceList,
-    OrderModal,
+    OrderModal
   ],
   imports: [
     BrowserModule,

@@ -3,10 +3,10 @@ import Swal from 'sweetalert2';
 import { AuthService } from '../../auth/Service/auth-service.service';
 import { iUserAuth } from './../../models/user';
 import { Component } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserModal } from '../../modals/user-modal/user-modal.component'; // Assicurati di importare il tuo UserModal
 import { ClientModal } from '../../modals/client-modal/client-modal.component';
 import { PriceList } from '../../modals/price-list/price-list.component';
+import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,16 +15,19 @@ import { PriceList } from '../../modals/price-list/price-list.component';
 })
 export class NavbarComponent {
 
-  constructor(private authSvc: AuthService, private modalService: NgbModal) {}
+  constructor(private authSvc: AuthService, private modalService: ModalService) {}
 
   userAuth: iUserAuth | null = null;
+  userRole: string = ''
 
   ngOnInit() {
     const accessDataString = localStorage.getItem('accessData');
     if (accessDataString) {
       const accessData = JSON.parse(accessDataString);
       this.userAuth = accessData.userAuth;
+      this.userRole = accessData.userAuth.role;
       console.log('Utente loggato: ', this.userAuth);
+      console.log('Ruolo Utente: ', this.userAuth);
     }
 
   }
@@ -53,18 +56,18 @@ export class NavbarComponent {
   }
 
   openUserModal() {
-    const userModalRef = this.modalService.open(UserModal); // Aggiunto l'opzione 'centered'
+    this.modalService.openUserModal();
   }
 
   openClientModal(){
-    const clentModalRef = this.modalService.open(ClientModal,{size: 'xl', scrollable: true})
+    this.modalService.openClientModal();
   }
 
   openPriceListModal(){
-    const clentModalRef = this.modalService.open(PriceList,{ size: 'xl', scrollable: true})
+    this.modalService.openPriceListModal();
   }
 
   openNewOrder() {
-    const orderModalRef = this.modalService.open(OrderModal,{size: 'xl', scrollable: true})
+    this.modalService.openNewOrderModal();
   }
 }

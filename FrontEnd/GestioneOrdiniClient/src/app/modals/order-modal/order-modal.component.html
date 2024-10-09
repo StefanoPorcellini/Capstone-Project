@@ -3,8 +3,173 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
 </div>
 <div class="modal-body">
-  <p>Hello, World!</p>
+  <form #orderForm="ngForm" (ngSubmit)="onSubmit(orderForm)">
+    <!-- Sezione Cliente -->
+    <div class="mb-3 d-flex justify-content-between gap-2">
+      <div class="d-flex align-items-center gap-2 flex-fill">
+        <label for="customer" class="form-label m-0">Cliente: </label>
+        <select id="customer" class="form-select" [(ngModel)]="newOrder.CustomerId" name="customerId"
+          (change)="onCustomerSelect()" required>
+          <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
+        </select>
+      </div>
+      <button (click)="openClientModal($event)" class="btn btn-primary">Vai alla Gestione Cliente</button>
+    </div>
+    <div *ngIf="selectedCustomer">
+      <p>Nome: {{ selectedCustomer.name }}</p>
+      <p>Telefono: {{ selectedCustomer.tel }}</p>
+      <p *ngIf="selectedCustomer.email">Email: {{ selectedCustomer.email }}</p>
+      <p>Tipo: {{ selectedCustomer.customerType === 'company' ? 'Azienda' : 'Privato' }}</p>
+      <p *ngIf="selectedCustomer.customerType === 'company'">Ragione Sociale: {{ selectedCustomer.ragioneSociale }}</p>
+    </div>
+
+    <!-- Sezione Date -->
+    <div class="mb-3">
+      <label for="startDate" class="form-label">Data Inizio Lavoro</label>
+      <input type="datetime-local" id="startDate" class="form-control" [(ngModel)]="newOrder.date" name="date" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="maxDeliveryDate" class="form-label">Data Massima di Consegna</label>
+      <input type="datetime-local" id="maxDeliveryDate" class="form-control" [(ngModel)]="newOrder.maxDeliveryDate"
+        name="maxDeliveryDate">
+    </div>
+
+    <!-- Sezione Descrizione -->
+    <div class="mb-3">
+      <label for="description" class="form-label">Descrizione del Lavoro</label>
+      <textarea id="description" class="form-control" [(ngModel)]="newOrder.description" name="description"
+        required></textarea>
+    </div>
+
+    <!-- Sezione Item -->
+    <h5>Articoli del Lavoro</h5>
+
+    <div class="mb-3">
+<div *ngFor="let workTypeItem of workType">
+  <div class="form-check">
+    <input class="form-check-input" type="radio"
+           [(ngModel)]="newItem.workTypeId"
+           [value]="workTypeItem.id"
+           id="{{workTypeItem.id}}" name="workTypeId">
+    <label class="form-check-label" for="{{workTypeItem.id}}">
+      {{ workTypeItem.name }}
+    </label>
+  </div>
+</div>
+    </div>
+
+<!-- Form per Laser (workTypeId === 1) -->
+<div *ngIf="newItem.workTypeId === 1">
+  <div class="mb-3">
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="isCustomLaser" [(ngModel)]="isLaserCustom" (change)="resetLaserFields()" name="isCustomLaser">
+      <label class="form-check-label" for="isCustomLaser">Articolo Personalizzato</label>
+    </div>
+  </div>
+  <div *ngIf="isLaserCustom" class="mb-3 d-flex gap-2">
+    <div class="flex-fill">
+      <label for="laserDescription" class="form-label">Descrizione</label>
+      <input type="text" id="laserDescription" class="form-control" [(ngModel)]="newItem.workDescription" name="laserDescription" required>
+    </div>
+    <div class="flex-fill">
+      <label for="laserQuantity" class="form-label">Quantità</label>
+      <input type="number" id="laserQuantity" class="form-control" [(ngModel)]="newItem.quantity" name="laserQuantity" required>
+    </div>
+  </div>
+  <div *ngIf="!isLaserCustom" class="mb-3 d-flex gap-2">
+    <div class="flex-fill">
+      <label for="laserStandardId" class="form-label">Prodotto LaserStandard</label>
+      <select id="laserStandardId" class="form-select" [(ngModel)]="laserStandardId" name="laserStandardId" (change)="onLaserStandardSelect($event)" required>
+        <option *ngFor="let laser of laserStandard" [value]="laser.id">{{ laser.description }}</option>
+      </select>
+    </div>
+    <div class="flex-fill">
+      <label for="quantity" class="form-label">Quantità</label>
+      <input type="number" id="quantity" class="form-control" [(ngModel)]="newItem.quantity" name="quantity" required>
+    </div>
+  </div>
+</div>
+
+<!-- Form per Plotter (workTypeId === 2) -->
+<div *ngIf="newItem.workTypeId === 2">
+  <div class="mb-3">
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="isCustomPlotter" [(ngModel)]="isPlotterCustom" (change)="resetPlotterFields()" name="isCustomPlotter">
+      <label class="form-check-label" for="isCustomPlotter">Articolo Personalizzato</label>
+    </div>
+  </div>
+  <div *ngIf="isPlotterCustom" class="mb-3 d-flex gap-2">
+    <div class="flex-fill">
+      <label for="plotterDescription" class="form-label">Descrizione</label>
+      <input type="text" id="plotterDescription" class="form-control" [(ngModel)]="newItem.workDescription" name="plotterDescription" required>
+    </div>
+    <div class="flex-fill">
+      <label for="base" class="form-label">Base (m)</label>
+      <input type="number" id="base" class="form-control" [(ngModel)]="newItem.base" name="base" required>
+    </div>
+    <div class="flex-fill">
+      <label for="height" class="form-label">Altezza (m)</label>
+      <input type="number" id="height" class="form-control" [(ngModel)]="newItem.height" name="height" required>
+    </div>
+    <div class="flex-fill">
+      <label for="quantityPlotter" class="form-label">Quantità</label>
+      <input type="number" id="quantityPlotter" class="form-control" [(ngModel)]="newItem.quantity" name="quantityPlotter" required>
+    </div>
+  </div>
+  <div *ngIf="!isPlotterCustom" class="mb-3 d-flex gap-2">
+    <div class="flex-fill">
+      <label for="plotterStandardId" class="form-label">Prodotto PlotterStandard</label>
+      <select id="plotterStandardId" class="form-select" [(ngModel)]="plotterStandardId" name="plotterStandardId" (change)="onPlotterStandardSelect($event)" required>
+        <option *ngFor="let plotter of plotterStandard" [value]="plotter.id">{{ plotter.description }}</option>
+      </select>
+    </div>
+    <div class="flex-fill">
+      <label for="quantityPlotter" class="form-label">Quantità</label>
+      <input type="number" id="quantityPlotter" class="form-control" [(ngModel)]="newItem.quantity" name="quantityPlotter" required>
+    </div>
+  </div>
+</div>
+
+    <!-- Pulsante per aggiungere file -->
+    <div class="mb-3">
+      <label for="fileUpload" class="form-label">Carica un file</label>
+      <input type="file" id="fileUpload" (change)="onFileSelected($event)" class="form-control">
+    </div>
+
+    <!-- Pulsante per aggiungere l'articolo -->
+    <div class="align-self-end">
+      <button type="button" class="btn btn-primary" (click)="addItem()">Aggiungi articolo</button>
+    </div>
+
+    <!-- Tabella Items -->
+    <table class="table table-bordered mt-3">
+      <thead>
+        <tr>
+          <th>Tipo di Lavoro</th>
+          <th>Descrizione</th>
+          <th>Quantità</th>
+          <th>File</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of newOrderWithItem.ItemsWithFiles">
+          <td>{{ getWorkTypeName(item.workTypeId) }}</td>
+          <td>{{ item.workDescription }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.file?.name || 'Nessun file caricato' }}</td>
+          <td>
+            <button type="button" class="btn btn-danger" (click)="removeItem(item)">
+              <i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button type="submit" [disabled]="newOrderWithItem.ItemsWithFiles.length === 0" class="btn btn-primary">Crea Ordine</button>
+  </form>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Close</button>
+  <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Chiudi</button>
 </div>

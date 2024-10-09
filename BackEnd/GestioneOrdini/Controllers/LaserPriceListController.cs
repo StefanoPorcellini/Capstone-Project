@@ -9,7 +9,7 @@ namespace GestioneOrdini.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles ="Admin, Owner")]
+    [Authorize(Roles ="Admin, Titolare")]
     public class LaserPriceListController : ControllerBase
     {
         private readonly ILaserPriceListService _laserPriceListService;

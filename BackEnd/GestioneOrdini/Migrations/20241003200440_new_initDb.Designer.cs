@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestioneOrdini.Migrations
 {
     [DbContext(typeof(OrdersDbContext))]
-    [Migration("20240827132106_editDb")]
-    partial class editDb
+    [Migration("20241003200440_new_initDb")]
+    partial class new_initDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,10 +36,10 @@ namespace GestioneOrdini.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CustomerType")
+                    b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -56,7 +56,7 @@ namespace GestioneOrdini.Migrations
 
                     b.ToTable("Customers");
 
-                    b.HasDiscriminator<string>("CustomerType").HasValue("Base");
+                    b.HasDiscriminator().HasValue("Customer");
 
                     b.UseTphMappingStrategy();
                 });
@@ -69,24 +69,33 @@ namespace GestioneOrdini.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
+                    b.Property<string>("FileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("FilePath")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
 
                     b.Property<string>("WorkDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("WorkTypeId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Item");
+                    b.HasIndex("OrderId");
 
-                    b.HasDiscriminator().HasValue("Item");
+                    b.HasIndex("WorkTypeId");
+
+                    b.ToTable("Items");
+
+                    b.HasDiscriminator<int>("WorkTypeId");
 
                     b.UseTphMappingStrategy();
                 });
@@ -122,24 +131,49 @@ namespace GestioneOrdini.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("MaxDeliveryDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("OperatorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId");
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("StatusId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("GestioneOrdini.Model.Order.OrderStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("StatusName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderStatuses");
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.Order.PlotterStandard", b =>
@@ -160,6 +194,49 @@ namespace GestioneOrdini.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PlotterStandards");
+                });
+
+            modelBuilder.Entity("GestioneOrdini.Model.Order.WorkType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkTypes");
+                });
+
+            modelBuilder.Entity("GestioneOrdini.Model.PriceList.LaserPriceList", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MaxQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LaserPriceLists");
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.User.Role", b =>
@@ -214,13 +291,15 @@ namespace GestioneOrdini.Migrations
 
                     b.Property<string>("PartitaIVA")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("RagioneSociale")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.HasDiscriminator().HasValue("Company");
+                    b.HasDiscriminator().HasValue("CustomerCompany");
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.Clients.CustomerPrivate", b =>
@@ -228,18 +307,18 @@ namespace GestioneOrdini.Migrations
                     b.HasBaseType("GestioneOrdini.Model.Clients.Customer");
 
                     b.Property<string>("CF")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
 
-                    b.HasDiscriminator().HasValue("Private");
+                    b.HasDiscriminator().HasValue("CustomerPrivate");
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.Order.LaserItem", b =>
                 {
                     b.HasBaseType("GestioneOrdini.Model.Order.Item");
 
-                    b.Property<string>("CustomDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsLaserCustom")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("LaserStandardId")
                         .HasColumnType("int");
@@ -249,7 +328,7 @@ namespace GestioneOrdini.Migrations
 
                     b.HasIndex("LaserStandardId");
 
-                    b.HasDiscriminator().HasValue("Laser");
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("PlotterItem", b =>
@@ -262,26 +341,65 @@ namespace GestioneOrdini.Migrations
                     b.Property<double?>("Height")
                         .HasColumnType("float");
 
+                    b.Property<bool>("IsPlotterCustom")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("PlotterStandardId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("PricePerSquareMeter")
+                    b.Property<decimal>("PricePerSquareMeter")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
 
                     b.HasIndex("PlotterStandardId");
 
-                    b.HasDiscriminator().HasValue("Plotter");
+                    b.ToTable("Items", t =>
+                        {
+                            t.Property("Quantity")
+                                .HasColumnName("PlotterItem_Quantity");
+                        });
+
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("GestioneOrdini.Model.Order.Item", b =>
+                {
+                    b.HasOne("GestioneOrdini.Model.Order.Order", "Order")
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GestioneOrdini.Model.Order.WorkType", "Type")
+                        .WithMany()
+                        .HasForeignKey("WorkTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.Order.Order", b =>
                 {
-                    b.HasOne("GestioneOrdini.Model.Order.Item", "Item")
-                        .WithMany()
-                        .HasForeignKey("ItemId")
+                    b.HasOne("GestioneOrdini.Model.Clients.Customer", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Item");
+                    b.HasOne("GestioneOrdini.Model.Order.OrderStatus", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.User.User", b =>
@@ -313,6 +431,16 @@ namespace GestioneOrdini.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("PlotterStandard");
+                });
+
+            modelBuilder.Entity("GestioneOrdini.Model.Clients.Customer", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("GestioneOrdini.Model.Order.Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

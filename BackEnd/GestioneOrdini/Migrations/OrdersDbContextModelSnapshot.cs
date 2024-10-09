@@ -33,6 +33,11 @@ namespace GestioneOrdini.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -47,6 +52,10 @@ namespace GestioneOrdini.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+
+                    b.HasDiscriminator().HasValue("Customer");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.Order.Item", b =>
@@ -56,11 +65,6 @@ namespace GestioneOrdini.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
 
                     b.Property<string>("FileName")
                         .HasMaxLength(255)
@@ -88,7 +92,7 @@ namespace GestioneOrdini.Migrations
 
                     b.ToTable("Items");
 
-                    b.HasDiscriminator().HasValue("Item");
+                    b.HasDiscriminator<int>("WorkTypeId");
 
                     b.UseTphMappingStrategy();
                 });
@@ -278,30 +282,39 @@ namespace GestioneOrdini.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("LaserItemLaserPriceList", b =>
+            modelBuilder.Entity("GestioneOrdini.Model.Clients.CustomerCompany", b =>
                 {
-                    b.Property<int>("LaserItemsId")
-                        .HasColumnType("int");
+                    b.HasBaseType("GestioneOrdini.Model.Clients.Customer");
 
-                    b.Property<int>("LaserPriceListsId")
-                        .HasColumnType("int");
+                    b.Property<string>("PartitaIVA")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
-                    b.HasKey("LaserItemsId", "LaserPriceListsId");
+                    b.Property<string>("RagioneSociale")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.HasIndex("LaserPriceListsId");
+                    b.HasDiscriminator().HasValue("CustomerCompany");
+                });
 
-                    b.ToTable("LaserItemLaserPriceList");
+            modelBuilder.Entity("GestioneOrdini.Model.Clients.CustomerPrivate", b =>
+                {
+                    b.HasBaseType("GestioneOrdini.Model.Clients.Customer");
+
+                    b.Property<string>("CF")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.HasDiscriminator().HasValue("CustomerPrivate");
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.Order.LaserItem", b =>
                 {
                     b.HasBaseType("GestioneOrdini.Model.Order.Item");
 
-                    b.Property<string>("CustomDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCustom")
+                    b.Property<bool>("IsLaserCustom")
                         .HasColumnType("bit");
 
                     b.Property<int?>("LaserStandardId")
@@ -312,7 +325,7 @@ namespace GestioneOrdini.Migrations
 
                     b.HasIndex("LaserStandardId");
 
-                    b.HasDiscriminator().HasValue("LaserItem");
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("PlotterItem", b =>
@@ -325,13 +338,13 @@ namespace GestioneOrdini.Migrations
                     b.Property<double?>("Height")
                         .HasColumnType("float");
 
-                    b.Property<bool>("IsCustom")
+                    b.Property<bool>("IsPlotterCustom")
                         .HasColumnType("bit");
 
                     b.Property<int?>("PlotterStandardId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("PricePerSquareMeter")
+                    b.Property<decimal>("PricePerSquareMeter")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("Quantity")
@@ -341,14 +354,11 @@ namespace GestioneOrdini.Migrations
 
                     b.ToTable("Items", t =>
                         {
-                            t.Property("IsCustom")
-                                .HasColumnName("PlotterItem_IsCustom");
-
                             t.Property("Quantity")
                                 .HasColumnName("PlotterItem_Quantity");
                         });
 
-                    b.HasDiscriminator().HasValue("PlotterItem");
+                    b.HasDiscriminator().HasValue(2);
                 });
 
             modelBuilder.Entity("GestioneOrdini.Model.Order.Item", b =>
@@ -360,7 +370,7 @@ namespace GestioneOrdini.Migrations
                         .IsRequired();
 
                     b.HasOne("GestioneOrdini.Model.Order.WorkType", "Type")
-                        .WithMany("Items")
+                        .WithMany()
                         .HasForeignKey("WorkTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -379,7 +389,7 @@ namespace GestioneOrdini.Migrations
                         .IsRequired();
 
                     b.HasOne("GestioneOrdini.Model.Order.OrderStatus", "Status")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -400,25 +410,10 @@ namespace GestioneOrdini.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("LaserItemLaserPriceList", b =>
-                {
-                    b.HasOne("GestioneOrdini.Model.Order.LaserItem", null)
-                        .WithMany()
-                        .HasForeignKey("LaserItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GestioneOrdini.Model.PriceList.LaserPriceList", null)
-                        .WithMany()
-                        .HasForeignKey("LaserPriceListsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("GestioneOrdini.Model.Order.LaserItem", b =>
                 {
                     b.HasOne("GestioneOrdini.Model.Order.LaserStandard", "LaserStandard")
-                        .WithMany("LaserItems")
+                        .WithMany()
                         .HasForeignKey("LaserStandardId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -428,7 +423,7 @@ namespace GestioneOrdini.Migrations
             modelBuilder.Entity("PlotterItem", b =>
                 {
                     b.HasOne("GestioneOrdini.Model.Order.PlotterStandard", "PlotterStandard")
-                        .WithMany("PlotterItems")
+                        .WithMany()
                         .HasForeignKey("PlotterStandardId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -440,27 +435,7 @@ namespace GestioneOrdini.Migrations
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("GestioneOrdini.Model.Order.LaserStandard", b =>
-                {
-                    b.Navigation("LaserItems");
-                });
-
             modelBuilder.Entity("GestioneOrdini.Model.Order.Order", b =>
-                {
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("GestioneOrdini.Model.Order.OrderStatus", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("GestioneOrdini.Model.Order.PlotterStandard", b =>
-                {
-                    b.Navigation("PlotterItems");
-                });
-
-            modelBuilder.Entity("GestioneOrdini.Model.Order.WorkType", b =>
                 {
                     b.Navigation("Items");
                 });

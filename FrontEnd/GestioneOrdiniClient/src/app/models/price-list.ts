@@ -4,7 +4,6 @@ export interface iLaserPriceList {
   maxQuantity: number;
   unitPrice: number;
   description: string;
-  laserItemId: number
 }
 
 export interface iLaserStandard {

@@ -12,11 +12,23 @@
   <div *ngIf="showForm" class="mt-4">
     <h5>Nuovo Cliente</h5>
     <form (submit)="createCustomer()">
-      <div class="mb-3">
-        <label for="customerType">Tipo Cliente</label><br>
-        <input type="radio" id="private" name="customerType" [(ngModel)]="newCustomer.customerType" value="private"> Privato
-        <input type="radio" id="company" name="customerType" [(ngModel)]="newCustomer.customerType" value="company"> Azienda
-      </div>
+      <div class="mb-3 d-flex align-items-center gap-2">
+        <label for="customerType">Tipo Cliente: </label><br>
+        <div class="custom-radio d-flex align-items-center gap-2">
+          <div>
+            <label for="private">
+              <input type="radio" id="private" name="customerType" [(ngModel)]="newCustomer.customerType" value="private">
+              Privato
+            </label>
+        </div>
+          <div>
+            <label for="company">
+              <input type="radio" id="company" name="customerType" [(ngModel)]="newCustomer.customerType" value="company">
+              Azienda
+            </label>
+            </div>
+        </div>
+        </div>
       <div class="mb-3">
         <label for="name">Nome</label>
         <input type="text" id="name" [(ngModel)]="newCustomer.name" name="name" class="form-control" required>
